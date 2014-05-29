@@ -1,0 +1,9 @@
+Inputs:
+	Geometry
+	- Shape 		(int)
+	- fiber diameter	(double)
+	- VF			(double)
+
+	Material
+	- Model  		(int)
+	- 
