@@ -6,4 +6,12 @@ Inputs:
 
 	Material
 	- Model  		(int)
-	- 
+	- required variables	(double)
+
+	Loading (optional)
+	- # of Loading Points	(int)
+	- Loading strains
+
+Outputs:
+	C-tensor
+	Stress
