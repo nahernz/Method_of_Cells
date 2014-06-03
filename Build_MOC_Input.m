@@ -31,6 +31,7 @@ fprintf(fid,'NMATS=%i\n',nmats);
 mat = 1;
 cmod = 1;
 %   1 = general elastic
+%   2 = isotropic elastic
 %   add other models later
 
 if cmod == 1
@@ -52,6 +53,15 @@ if cmod == 1
 
 % add more material models here
 
+elseif cmod == 2
+    E = 3e9;   % Pa
+    v = .36;     
+
+    
+    % write input
+    fprintf(fid,'MAT=%i,CMOD=%i\n',mat,cmod);
+    fprintf(fid,'E=%0.0f\n',E);
+    fprintf(fid,'NU=%0.3f\n%%\n',v);
 else
     disp('add more material models')
 end
@@ -63,7 +73,26 @@ cmod = 2;
 %   2 = isotropic elastic
 %   add other models later
 
-if cmod == 2
+if cmod == 1
+    E11 = 231e9;   % Pa
+    E22 = 15e9;    % Pa
+    v12 = .14;     
+    G12 = 24e9;    % Pa
+    G23 = 5.01e9;  % Pa
+    v23 = (E22/(2*G23))-1;
+    
+    % write input
+    fprintf(fid,'MAT=%i,CMOD=%i\n',mat,cmod);
+    fprintf(fid,'EA=%0.0f\n',E11);
+    fprintf(fid,'ET=%0.0f\n',E22);
+    fprintf(fid,'NUA=%0.3f\n',v23);
+    fprintf(fid,'NUT=%0.3f\n',v12);
+    fprintf(fid,'GA=%0.0f\n',G23);
+    fprintf(fid,'GT=%0.0f\n%%\n',G12);
+
+% add more material models here
+
+elseif cmod == 2
     E = 3e9;   % Pa
     v = .36;     
 
@@ -72,8 +101,6 @@ if cmod == 2
     fprintf(fid,'MAT=%i,CMOD=%i\n',mat,cmod);
     fprintf(fid,'E=%0.0f\n',E);
     fprintf(fid,'NU=%0.3f\n%%\n',v);
-
-% add more material models here
 else
     disp('add more material models')
 end
@@ -131,7 +158,7 @@ lmod = 1;
 %   3 = shear strain
 %   add other cases
 
-if lmod == 1
+if lmod == 1 % axial strain
     loads = [1e-3,2e-3]; 
     Nloads = size(loads,2);
     
@@ -142,7 +169,8 @@ if lmod == 1
         fprintf(fid,'%0.5f,',loads(i));
     end
     fprintf(fid,'\n');
-elseif lmod == 2
+    
+elseif lmod == 2 % tangential strain
     loads = [1e-3,2e-3];
     Nloads = size(loads,2);
     
@@ -153,7 +181,8 @@ elseif lmod == 2
         fprintf(fid,'%0.5f,',loads(i));
     end
     fprintf(fid,'\n');
-elseif lmod == 3
+    
+elseif lmod == 3 % shear strain
     loads = [1e-3,2e-3];
     Nloads = size(loads,2);
     
