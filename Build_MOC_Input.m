@@ -10,7 +10,7 @@ function Build_MOC_Input
 % create the filespace
 mkdir('Inputs');
 cd('Inputs');
-filename = 'input002.moc';
+filename = 'input003.moc';
 fid = fopen(filename,'w+');
 cd('../');
 
@@ -44,12 +44,12 @@ if cmod == 1
     
     % write input
     fprintf(fid,'MAT=%i,CMOD=%i\n',mat,cmod);
-    fprintf(fid,'EA=%0.0f\n',E11);
-    fprintf(fid,'ET=%0.0f\n',E22);
+    fprintf(fid,'EA=%8.3e\n',E11);
+    fprintf(fid,'ET=%8.3e\n',E22);
     fprintf(fid,'NUA=%0.3f\n',v23);
     fprintf(fid,'NUT=%0.3f\n',v12);
-    fprintf(fid,'GA=%0.0f\n',G23);
-    fprintf(fid,'GT=%0.0f\n%%\n',G12);
+    fprintf(fid,'GA=%8.3e\n',G23);
+    fprintf(fid,'GT=%8.3e\n%%\n',G12);
 
 % add more material models here
 
@@ -60,7 +60,7 @@ elseif cmod == 2
     
     % write input
     fprintf(fid,'MAT=%i,CMOD=%i\n',mat,cmod);
-    fprintf(fid,'E=%0.0f\n',E);
+    fprintf(fid,'E=%8.3e\n',E);
     fprintf(fid,'NU=%0.3f\n%%\n',v);
 else
     disp('add more material models')
@@ -83,12 +83,12 @@ if cmod == 1
     
     % write input
     fprintf(fid,'MAT=%i,CMOD=%i\n',mat,cmod);
-    fprintf(fid,'EA=%0.0f\n',E11);
-    fprintf(fid,'ET=%0.0f\n',E22);
+    fprintf(fid,'EA=%8.3e\n',E11);
+    fprintf(fid,'ET=%8.3e\n',E22);
     fprintf(fid,'NUA=%0.3f\n',v23);
     fprintf(fid,'NUT=%0.3f\n',v12);
-    fprintf(fid,'GA=%0.0f\n',G23);
-    fprintf(fid,'GT=%0.0f\n%%\n',G12);
+    fprintf(fid,'GA=%8.3e\n',G23);
+    fprintf(fid,'GT=%8.3e\n%%\n',G12);
     
 % add more material models here
 
@@ -99,7 +99,7 @@ elseif cmod == 2
     
     % write input
     fprintf(fid,'MAT=%i,CMOD=%i\n',mat,cmod);
-    fprintf(fid,'E=%0.0f\n',E);
+    fprintf(fid,'E=%8.3e\n',E);
     fprintf(fid,'NU=%0.3f\n%%\n',v);
 else
     disp('add more material models')
@@ -124,7 +124,7 @@ if amod == 1
     
     fprintf(fid,'AMOD=%i\n',amod);
     fprintf(fid,'VF=%0.3f\n',Vf);
-    fprintf(fid,'DF=%E\n%%\n',Df);
+    fprintf(fid,'DF=%8.3e\n%%\n',Df);
     
 elseif amod == 2
     Vf = 0.75;  % fiber volume fraction
@@ -132,7 +132,7 @@ elseif amod == 2
     
     fprintf(fid,'AMOD=%i\n',amod);
     fprintf(fid,'VF=%0.3f\n',Vf);
-    fprintf(fid,'DF=%0.9f\n%%\n',Df);
+    fprintf(fid,'DF=%8.3e\n%%\n',Df);
     
 elseif amod == 3
     Vf = 0.75;  % fiber volume fraction
@@ -140,7 +140,7 @@ elseif amod == 3
     
     fprintf(fid,'AMOD=%i\n',amod);
     fprintf(fid,'VF=%0.3f\n',Vf);
-    fprintf(fid,'DF=%E\n%%\n',Df);
+    fprintf(fid,'DF=%8.3e\n%%\n',Df);
     
 elseif amod == 4
     DIM = [2,2]; %[H,L]
@@ -159,13 +159,13 @@ elseif amod == 4
     
     fprintf(fid,'H=');
     for i = 1:size(H,2)
-        fprintf(fid,'%0.6f,',H(i));
+        fprintf(fid,'%8.3e,',H(i));
     end
     fprintf(fid,'\n');
     
     fprintf(fid,'L=');
     for i = 1:size(L,2)
-        fprintf(fid,'%0.6f,',L(i));
+        fprintf(fid,'%8.3e,',L(i));
     end
     fprintf(fid,'\n');
     
