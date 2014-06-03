@@ -10,7 +10,7 @@ function Build_MOC_Input
 % create the filespace
 mkdir('Inputs');
 cd('Inputs');
-filename = 'input001.moc';
+filename = 'input002.moc';
 fid = fopen(filename,'w+');
 cd('../');
 
@@ -89,7 +89,7 @@ if cmod == 1
     fprintf(fid,'NUT=%0.3f\n',v12);
     fprintf(fid,'GA=%0.0f\n',G23);
     fprintf(fid,'GT=%0.0f\n%%\n',G12);
-
+    
 % add more material models here
 
 elseif cmod == 2
@@ -111,10 +111,11 @@ end
 
 fprintf(fid,'*CELL\n');
 
-amod = 2;
+amod = 4;
 %   1 = 4 cell square
 %   2 = fiber centered square
 %   3 = hex packed rectangle 
+%   4 = user defined
 %   add other models
 
 if amod == 1
@@ -140,6 +141,39 @@ elseif amod == 3
     fprintf(fid,'AMOD=%i\n',amod);
     fprintf(fid,'VF=%0.3f\n',Vf);
     fprintf(fid,'DF=%E\n%%\n',Df);
+    
+elseif amod == 4
+    DIM = [2,2]; %[H,L]
+    
+    H = [1,1];  % fiber volume fraction
+    L = [1,1];   % fiber diameter (m)
+    SM = [1,2,2,2];
+    
+    fprintf(fid,'AMOD=%i\n',amod);
+    
+    fprintf(fid,'DIM=');
+    for i = 1:size(DIM,2)
+        fprintf(fid,'%i,',DIM(i));
+    end
+    fprintf(fid,'\n');
+    
+    fprintf(fid,'H=');
+    for i = 1:size(H,2)
+        fprintf(fid,'%0.6f,',H(i));
+    end
+    fprintf(fid,'\n');
+    
+    fprintf(fid,'L=');
+    for i = 1:size(L,2)
+        fprintf(fid,'%0.6f,',L(i));
+    end
+    fprintf(fid,'\n');
+    
+    fprintf(fid,'SM=');
+    for i = 1:size(SM,2)
+        fprintf(fid,'%i,',SM(i));
+    end
+    fprintf(fid,'\n%%\n');    
     
 end
 % NOTE 
