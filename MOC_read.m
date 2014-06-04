@@ -1,21 +1,28 @@
-function [mat,arch] = MOC_read(inputfile)
+function [mat,arch,load] = MOC_read(inputfile)
 
     fid = fopen(inputfile,'r');
 
     s = fgetl(fid);
-    while ischar(s)
+    while ~feof(fid)
         if ~isempty(strfind(s,'%')) % comment line
             s = fgetl(fid);
             continue
-        end
-        if ~isempty(strfind(s,'*CONSTITUENTS'))
+       
+        elseif ~isempty(strfind(s,'*CONSTITUENTS'))
             mat = constituents(fid);
-        end
-        if ~isempty(strfind(s,'*CELL'))
+               
+        elseif ~isempty(strfind(s,'*CELL'))
             arch = architecture(fid);
+                
+        elseif ~isempty(strfind(s,'*LOADING'))
+            load = loading(fid);
+                
+        elseif ~isempty(strfind(s,'*END'))
+            return
+        
+        else
+            fprintf(2,'LINE IGNORED!\n\n\t%s',s);
         end
-        
-        
         
         s = fgetl(fid);
     end
@@ -76,12 +83,35 @@ function arch = architecture(fid)
         for i = 2:dim(1)
             arch.h(i) = fscanf(fid,'%e,',1);
         end
-        
+        fgets(fid);
         arch.l(1) = fscanf(fid,'L=%e,',1);
         for i = 2:dim(2)
             arch.l(i) = fscanf(fid,'%e,',1);
         end
+        fgets(fid);
+        arch.sm(1) = fscanf(fid,'SM=%e,',1);
+        for i = 2:dim(1)*dim(2)
+            arch.sm(i) = fscanf(fid,'%i,',1);
+        end
+        fgets(fid);
+        
     end
 end
 
+function load = loading(fid)
+
+    load.lmod = fscanf(fid,'LMOD=%i\n',1);
+    
+    if ismember(load.lmod,[1 2 3])
+        load.nl = fscanf(fid,'NL=%i\n',1);
+        
+        load.l(1) = fscanf(fid,'L=%f,',1);
+        for i = 2:load.nl
+            load.l(i) = fscanf(fid,'%f,',1);
+        end
+        fgets(fid);
+    else
+        % add general loading here
+    end
+end
 

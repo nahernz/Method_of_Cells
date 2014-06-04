@@ -1,4 +1,5 @@
 function MOC(inputfile)
 
+inputfile = 'Inputs/input003.moc';
 
-MOC_read(inputfile)
+[mat,arch,load] = MOC_read(inputfile)
