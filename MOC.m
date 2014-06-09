@@ -92,228 +92,237 @@ nloads = load.nl;
 loads = load.l;
 
 % create loop for each load, assign strains for each load, compute outputs
+
     
 eglobal = [ez;ex;ey;exy;eyz;exz];
  
-%CREATE MATRICES --------------------------------- 
-A = zeros(Ng*Nb*6,Ng*Nb*6);
-K = zeros(Ng*Nb*6,6);
-count = 1;
-%Ag and J
-%e33
-for b = 1:Nb
+    %CREATE MATRICES
+    A = zeros(Ng*Nb*6,Ng*Nb*6);
+    K = zeros(Ng*Nb*6,6);
+    count = 1;
+    %Ag and J
+    %e33
+
+    for b = 1:Nb
+        for g = 1:Ng
+            A(count,(g-1)*6+(b-1)*6*Ng+3)=L(1,g);
+        end
+        K(count,3) = sum(L);
+        count = count + 1;
+    end
+    %e22
     for g = 1:Ng
-        A(count,(g-1)*6+(b-1)*6*Ng+3)=L(1,g);
+        for b = 1:Nb
+            A(count,(g-1)*6+(b-1)*6*Ng+2)=H(1,b);
+        end
+        K(count,2) = sum(H);
+        count = count + 1;
     end
-    K(count,3) = sum(L);
-    count = count + 1;
-end
-%e22
-for g = 1:Ng
+    %e11
+    for i = 1:Nb*Ng
+        A(count,(i-1)*6+1)=1;
+        K(count,1) = 1;
+        count = count + 1;
+    end
+    %e13
     for b = 1:Nb
-        A(count,(g-1)*6+(b-1)*6*Ng+2)=H(1,b);
+        for g = 1:Ng
+            A(count,(g-1)*6+(b-1)*6*Ng+5)=L(1,g);
+        end
+        K(count,5) = sum(L);
+        count = count + 1;
     end
-    K(count,2) = sum(H);
-    count = count + 1;
-end
-%e11
-for i = 1:Nb*Ng
-    A(count,(i-1)*6+1)=1;
-    K(count,1) = 1;
-    count = count + 1;
-end
-%e13
-for b = 1:Nb
+    %e12
     for g = 1:Ng
-        A(count,(g-1)*6+(b-1)*6*Ng+5)=L(1,g);
+        for b = 1:Nb
+            A(count,(g-1)*6+(b-1)*6*Ng+6)=H(1,b);
+        end
+        K(count,6) = sum(H);
+        count = count + 1;
     end
-    K(count,5) = sum(L);
+    %e23
+    for g = 1:Ng
+        for b = 1:Nb
+            A(count,(g-1)*6+(b-1)*6*Ng+4)=H(1,b)*L(1,g);
+        end
+    end
+    K(count,4) = sum(H)*sum(L);
     count = count + 1;
-end
-%e12
-for g = 1:Ng
+    A
+    %Am
+    %r22
+    for g = 1:Ng
+        for b = 1:(Nb-1)
+            if SM(b,g)==1
+                A(count,(g-1)*6+(b-1)*6*Ng+1)=Cf(2,1);
+                A(count,(g-1)*6+(b-1)*6*Ng+2)=Cf(2,2);
+                A(count,(g-1)*6+(b-1)*6*Ng+3)=Cf(2,3);           
+            else
+                A(count,(g-1)*6+(b-1)*6*Ng+1)=Cm(2,1);
+                A(count,(g-1)*6+(b-1)*6*Ng+2)=Cm(2,2);
+                A(count,(g-1)*6+(b-1)*6*Ng+3)=Cm(2,3);
+            end
+            if SM(b+1,g)==1
+                A(count,(g-1)*6+(b)*6*Ng+1)=-Cf(2,1);
+                A(count,(g-1)*6+(b)*6*Ng+2)=-Cf(2,2);
+                A(count,(g-1)*6+(b)*6*Ng+3)=-Cf(2,3);
+            else
+                A(count,(g-1)*6+(b)*6*Ng+1)=-Cm(2,1);
+                A(count,(g-1)*6+(b)*6*Ng+2)=-Cm(2,2);
+                A(count,(g-1)*6+(b)*6*Ng+3)=-Cm(2,3);
+            end
+            count = count + 1;
+        end
+    end
+    %r33
     for b = 1:Nb
-        A(count,(g-1)*6+(b-1)*6*Ng+6)=H(1,b);
+        for g = 1:(Ng-1)
+            if SM(b,g)==1
+                A(count,(g-1)*6+(b-1)*6*Ng+1)=Cf(3,1);
+                A(count,(g-1)*6+(b-1)*6*Ng+2)=Cf(3,2);
+                A(count,(g-1)*6+(b-1)*6*Ng+3)=Cf(3,3);    
+            else
+                A(count,(g-1)*6+(b-1)*6*Ng+1)=Cm(3,1);
+                A(count,(g-1)*6+(b-1)*6*Ng+2)=Cm(3,2);
+                A(count,(g-1)*6+(b-1)*6*Ng+3)=Cm(3,3);
+            end
+            if SM(b,g+1)==1
+                A(count,(g)*6+(b-1)*6*Ng+1)=-Cf(3,1);
+                A(count,(g)*6+(b-1)*6*Ng+2)=-Cf(3,2);
+                A(count,(g)*6+(b-1)*6*Ng+3)=-Cf(3,3);   
+            else
+                A(count,(g)*6+(b-1)*6*Ng+1)=-Cm(3,1);
+                A(count,(g)*6+(b-1)*6*Ng+2)=-Cm(3,2);
+                A(count,(g)*6+(b-1)*6*Ng+3)=-Cm(3,3);
+            end
+            count = count + 1;
+        end
     end
-    K(count,6) = sum(H);
-    count = count + 1;
-end
-%e23
-for g = 1:Ng
+    %r12
+    for g = 1:Ng
+        for b = 1:(Nb-1)
+            if SM(b,g)==1
+                A(count,(g-1)*6+(b-1)*6*Ng+6)=Cf(6,6);            
+            else
+                A(count,(g-1)*6+(b-1)*6*Ng+6)=Cm(6,6);
+            end
+            if SM(b+1,g)==1
+                A(count,(g-1)*6+(b)*6*Ng+6)=-Cf(6,6);
+            else
+                A(count,(g-1)*6+(b)*6*Ng+6)=-Cm(6,6);
+            end
+            count = count + 1;
+        end
+    end
+    %r13
     for b = 1:Nb
-        A(count,(g-1)*6+(b-1)*6*Ng+4)=H(1,b)*L(1,g);
+        for g = 1:(Ng-1)
+            if SM(b,g)==1
+                A(count,(g-1)*6+(b-1)*6*Ng+5)=Cf(5,5);            
+            else
+                A(count,(g-1)*6+(b-1)*6*Ng+5)=Cm(5,5);
+            end
+            if SM(b,g+1)==1
+                A(count,(g)*6+(b-1)*6*Ng+5)=-Cf(5,5);
+            else
+                A(count,(g)*6+(b-1)*6*Ng+5)=-Cm(5,5);
+            end
+            count = count + 1;
+        end
     end
-end
-K(count,4) = sum(H)*sum(L);
-count = count + 1;
-A
-%Am
-%r22
-for g = 1:Ng
-    for b = 1:(Nb-1)
-        if SM(b,g)==1
-            A(count,(g-1)*6+(b-1)*6*Ng+1)=Cf(2,1);
-            A(count,(g-1)*6+(b-1)*6*Ng+2)=Cf(2,2);
-            A(count,(g-1)*6+(b-1)*6*Ng+3)=Cf(2,3);           
-        else
-            A(count,(g-1)*6+(b-1)*6*Ng+1)=Cm(2,1);
-            A(count,(g-1)*6+(b-1)*6*Ng+2)=Cm(2,2);
-            A(count,(g-1)*6+(b-1)*6*Ng+3)=Cm(2,3);
-        end
-        if SM(b+1,g)==1
-            A(count,(g-1)*6+(b)*6*Ng+1)=-Cf(2,1);
-            A(count,(g-1)*6+(b)*6*Ng+2)=-Cf(2,2);
-            A(count,(g-1)*6+(b)*6*Ng+3)=-Cf(2,3);
-        else
-            A(count,(g-1)*6+(b)*6*Ng+1)=-Cm(2,1);
-            A(count,(g-1)*6+(b)*6*Ng+2)=-Cm(2,2);
-            A(count,(g-1)*6+(b)*6*Ng+3)=-Cm(2,3);
-        end
-        count = count + 1;
-    end
-end
-%r33
-for b = 1:Nb
-    for g = 1:(Ng-1)
-        if SM(b,g)==1
-            A(count,(g-1)*6+(b-1)*6*Ng+1)=Cf(3,1);
-            A(count,(g-1)*6+(b-1)*6*Ng+2)=Cf(3,2);
-            A(count,(g-1)*6+(b-1)*6*Ng+3)=Cf(3,3);    
-        else
-            A(count,(g-1)*6+(b-1)*6*Ng+1)=Cm(3,1);
-            A(count,(g-1)*6+(b-1)*6*Ng+2)=Cm(3,2);
-            A(count,(g-1)*6+(b-1)*6*Ng+3)=Cm(3,3);
-        end
-        if SM(b,g+1)==1
-            A(count,(g)*6+(b-1)*6*Ng+1)=-Cf(3,1);
-            A(count,(g)*6+(b-1)*6*Ng+2)=-Cf(3,2);
-            A(count,(g)*6+(b-1)*6*Ng+3)=-Cf(3,3);   
-        else
-            A(count,(g)*6+(b-1)*6*Ng+1)=-Cm(3,1);
-            A(count,(g)*6+(b-1)*6*Ng+2)=-Cm(3,2);
-            A(count,(g)*6+(b-1)*6*Ng+3)=-Cm(3,3);
-        end
-        count = count + 1;
-    end
-end
-%r12
-for g = 1:Ng
-    for b = 1:(Nb-1)
-        if SM(b,g)==1
-            A(count,(g-1)*6+(b-1)*6*Ng+6)=Cf(6,6);            
-        else
-            A(count,(g-1)*6+(b-1)*6*Ng+6)=Cm(6,6);
-        end
-        if SM(b+1,g)==1
-            A(count,(g-1)*6+(b)*6*Ng+6)=-Cf(6,6);
-        else
-            A(count,(g-1)*6+(b)*6*Ng+6)=-Cm(6,6);
-        end
-        count = count + 1;
-    end
-end
-%r13
-for b = 1:Nb
-    for g = 1:(Ng-1)
-        if SM(b,g)==1
-            A(count,(g-1)*6+(b-1)*6*Ng+5)=Cf(5,5);            
-        else
-            A(count,(g-1)*6+(b-1)*6*Ng+5)=Cm(5,5);
-        end
-        if SM(b,g+1)==1
-            A(count,(g)*6+(b-1)*6*Ng+5)=-Cf(5,5);
-        else
-            A(count,(g)*6+(b-1)*6*Ng+5)=-Cm(5,5);
-        end
-        count = count + 1;
-    end
-end
-%r23
-for g = 1:Ng
-    for b = 1:(Nb-1)
-        if SM(b,g)==1
-            A(count,(g-1)*6+(b-1)*6*Ng+4)=Cf(4,4);            
-        else
-            A(count,(g-1)*6+(b-1)*6*Ng+4)=Cm(4,4);
-        end
-        if SM(b+1,g)==1
-            A(count,(g-1)*6+(b)*6*Ng+4)=-Cf(4,4);
-        else
-            A(count,(g-1)*6+(b)*6*Ng+4)=-Cm(4,4);
-        end
-        count = count + 1;
-    end
-end
-for b = 1:Nb
-    for g = 1:(Ng-1)
-        if count<=Nb*Ng*6
+    %r23
+    for g = 1:Ng
+        for b = 1:(Nb-1)
             if SM(b,g)==1
                 A(count,(g-1)*6+(b-1)*6*Ng+4)=Cf(4,4);            
             else
                 A(count,(g-1)*6+(b-1)*6*Ng+4)=Cm(4,4);
             end
-            if SM(b,g+1)==1
-                A(count,(g)*6+(b-1)*6*Ng+4)=-Cf(4,4);
+            if SM(b+1,g)==1
+                A(count,(g-1)*6+(b)*6*Ng+4)=-Cf(4,4);
             else
-                A(count,(g)*6+(b-1)*6*Ng+4)=-Cm(4,4);
+                A(count,(g-1)*6+(b)*6*Ng+4)=-Cm(4,4);
             end
             count = count + 1;
         end
     end
-end
-%SOLVE
-B = A\K;
-esub = B*eglobal;
-C=zeros(Nb*Ng*6,Nb*Ng*6);
-for b=1:Nb
-    for g=1:Ng
-        i=(b-1)*Ng+g;
-        if SM(b,g)==1
-            C((6*i-5):(6*i),(6*i-5):(6*i))=Cf;
-        else
-            C((6*i-5):(6*i),(6*i-5):(6*i))=Cm;
+    for b = 1:Nb
+        for g = 1:(Ng-1)
+            if count<=Nb*Ng*6
+                if SM(b,g)==1
+                    A(count,(g-1)*6+(b-1)*6*Ng+4)=Cf(4,4);            
+                else
+                    A(count,(g-1)*6+(b-1)*6*Ng+4)=Cm(4,4);
+                end
+                if SM(b,g+1)==1
+                    A(count,(g)*6+(b-1)*6*Ng+4)=-Cf(4,4);
+                else
+                    A(count,(g)*6+(b-1)*6*Ng+4)=-Cm(4,4);
+                end
+                count = count + 1;
+            end
         end
     end
-end
-rsub = C*esub;
-for i=1:size(esub,1)
-    if rsub(i,1) < 0.0000001
-        rsub(i,1) = 0;
+    %SOLVE
+    B = A\K;
+    esub = B*eglobal;
+    C=zeros(Nb*Ng*6,Nb*Ng*6);
+    for b=1:Nb
+        for g=1:Ng
+            i=(b-1)*Ng+g;
+            if SM(b,g)==1
+                C((6*i-5):(6*i),(6*i-5):(6*i))=Cf;
+            else
+                C((6*i-5):(6*i),(6*i-5):(6*i))=Cm;
+            end
+        end
     end
-    if esub(i,1) < 0.0000001
-        esub(i,1) = 0;
+    rsub = C*esub;
+    for i=1:size(esub,1)
+        if rsub(i,1) < 0.0000001
+            rsub(i,1) = 0;
+        end
+        if esub(i,1) < 0.0000001
+            esub(i,1) = 0;
+        end
     end
-end
-e1=zeros(Nb,Ng);
-e2=zeros(Nb,Ng);
-e3=zeros(Nb,Ng);
-e23=zeros(Nb,Ng);
-e13=zeros(Nb,Ng);
-e12=zeros(Nb,Ng);
-for b=1:Nb
-    for g=1:Ng
-        e1(b,g)  = esub((g-1)*6+(b-1)*6*Ng+1,1);
-        e2(b,g)  = esub((g-1)*6+(b-1)*6*Ng+2,1);
-        e3(b,g)  = esub((g-1)*6+(b-1)*6*Ng+3,1);
-        e23(b,g) = esub((g-1)*6+(b-1)*6*Ng+4,1);
-        e13(b,g) = esub((g-1)*6+(b-1)*6*Ng+5,1);
-        e12(b,g) = esub((g-1)*6+(b-1)*6*Ng+6,1);
+    e1=zeros(Nb,Ng);
+    e2=zeros(Nb,Ng);
+    e3=zeros(Nb,Ng);
+    e23=zeros(Nb,Ng);
+    e13=zeros(Nb,Ng);
+    e12=zeros(Nb,Ng);
+    for b=1:Nb
+        for g=1:Ng
+            e1(b,g)  = esub((g-1)*6+(b-1)*6*Ng+1,1);
+            e2(b,g)  = esub((g-1)*6+(b-1)*6*Ng+2,1);
+            e3(b,g)  = esub((g-1)*6+(b-1)*6*Ng+3,1);
+            e23(b,g) = esub((g-1)*6+(b-1)*6*Ng+4,1);
+            e13(b,g) = esub((g-1)*6+(b-1)*6*Ng+5,1);
+            e12(b,g) = esub((g-1)*6+(b-1)*6*Ng+6,1);
+        end
     end
-end
-r1=zeros(Nb,Ng);
-r2=zeros(Nb,Ng);
-r3=zeros(Nb,Ng);
-r23=zeros(Nb,Ng);
-r13=zeros(Nb,Ng);
-r12=zeros(Nb,Ng);
-for b=1:Nb
-    for g=1:Ng
-        r1(b,g)  = rsub((g-1)*6+(b-1)*6*Ng+1,1);
-        r2(b,g)  = rsub((g-1)*6+(b-1)*6*Ng+2,1);
-        r3(b,g)  = rsub((g-1)*6+(b-1)*6*Ng+3,1);
-        r23(b,g) = rsub((g-1)*6+(b-1)*6*Ng+4,1);
-        r13(b,g) = rsub((g-1)*6+(b-1)*6*Ng+5,1);
-        r12(b,g) = rsub((g-1)*6+(b-1)*6*Ng+6,1);
+    r1=zeros(Nb,Ng);
+    r2=zeros(Nb,Ng);
+    r3=zeros(Nb,Ng);
+    r23=zeros(Nb,Ng);
+    r13=zeros(Nb,Ng);
+    r12=zeros(Nb,Ng);
+    for b=1:Nb
+        for g=1:Ng
+            r1(b,g)  = rsub((g-1)*6+(b-1)*6*Ng+1,1);
+            r2(b,g)  = rsub((g-1)*6+(b-1)*6*Ng+2,1);
+            r3(b,g)  = rsub((g-1)*6+(b-1)*6*Ng+3,1);
+            r23(b,g) = rsub((g-1)*6+(b-1)*6*Ng+4,1);
+            r13(b,g) = rsub((g-1)*6+(b-1)*6*Ng+5,1);
+            r12(b,g) = rsub((g-1)*6+(b-1)*6*Ng+6,1);
+        end
     end
+    
+    
+    
+    % output to file
+    
+end % loading
 end
 
