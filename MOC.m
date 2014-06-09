@@ -111,7 +111,7 @@ exz = 0;
 eyz = 0;
 eglobal = [ez;ex;ey;exy;eyz;exz];
  
-%CREATE MATRICES
+%CREATE MATRICES --------------------------------- 
 A = zeros(Ng*Nb*6,Ng*Nb*6);
 K = zeros(Ng*Nb*6,6);
 count = 1;
