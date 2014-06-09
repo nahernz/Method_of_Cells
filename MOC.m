@@ -2,7 +2,7 @@ function [C,s,e] = MOC(inputfile)
 
 inputfile = 'Inputs/input003.moc';
 
-[mat,arch,load] = MOC_read(inputfile)
+[mat,arch,load] = MOC_read(inputfile);
 
 
 % Materials
@@ -62,6 +62,7 @@ elseif amod == 4
             c = c+1;
         end
     end
+    SM
 end    
 
 Ng = size(L,2);
@@ -94,6 +95,19 @@ loads = load.l;
 % create loop for each load, assign strains for each load, compute outputs
 
 for nl = 1:nloads
+    if lmod == 1
+        ex = loads(nl);
+        
+    elseif lmod == 2
+        ey = loads(nl);
+        
+    elseif lmod == 3
+        eyz = loads(nl);
+        
+    elseif lmod == 4
+        error('myApp:argChk', 'ADD FUNCTIONALITY FOR GENERAL LOADING')
+        
+    end
     
     eglobal = [ez;ex;ey;exy;eyz;exz];
  
@@ -149,117 +163,91 @@ for nl = 1:nloads
     end
     K(count,4) = sum(H)*sum(L);
     count = count + 1;
-    A
+    
     %Am
     %r22
     for g = 1:Ng
         for b = 1:(Nb-1)
-            if SM(b,g)==1
-                A(count,(g-1)*6+(b-1)*6*Ng+1)=Cf(2,1);
-                A(count,(g-1)*6+(b-1)*6*Ng+2)=Cf(2,2);
-                A(count,(g-1)*6+(b-1)*6*Ng+3)=Cf(2,3);           
-            else
-                A(count,(g-1)*6+(b-1)*6*Ng+1)=Cm(2,1);
-                A(count,(g-1)*6+(b-1)*6*Ng+2)=Cm(2,2);
-                A(count,(g-1)*6+(b-1)*6*Ng+3)=Cm(2,3);
-            end
-            if SM(b+1,g)==1
-                A(count,(g-1)*6+(b)*6*Ng+1)=-Cf(2,1);
-                A(count,(g-1)*6+(b)*6*Ng+2)=-Cf(2,2);
-                A(count,(g-1)*6+(b)*6*Ng+3)=-Cf(2,3);
-            else
-                A(count,(g-1)*6+(b)*6*Ng+1)=-Cm(2,1);
-                A(count,(g-1)*6+(b)*6*Ng+2)=-Cm(2,2);
-                A(count,(g-1)*6+(b)*6*Ng+3)=-Cm(2,3);
-            end
+            
+            matn = SM(b,g);
+                A(count,(g-1)*6+(b-1)*6*Ng+1)=Cn{matn}(2,1);
+                A(count,(g-1)*6+(b-1)*6*Ng+2)=Cn{matn}(2,2);
+                A(count,(g-1)*6+(b-1)*6*Ng+3)=Cn{matn}(2,3);    
+                        
+            matm = SM(b+1,g);
+                A(count,(g-1)*6+(b)*6*Ng+1)=-Cn{matm}(2,1);
+                A(count,(g-1)*6+(b)*6*Ng+2)=-Cn{matm}(2,2);
+                A(count,(g-1)*6+(b)*6*Ng+3)=-Cn{matm}(2,3);   
+
             count = count + 1;
         end
     end
     %r33
     for b = 1:Nb
         for g = 1:(Ng-1)
-            if SM(b,g)==1
-                A(count,(g-1)*6+(b-1)*6*Ng+1)=Cf(3,1);
-                A(count,(g-1)*6+(b-1)*6*Ng+2)=Cf(3,2);
-                A(count,(g-1)*6+(b-1)*6*Ng+3)=Cf(3,3);    
-            else
-                A(count,(g-1)*6+(b-1)*6*Ng+1)=Cm(3,1);
-                A(count,(g-1)*6+(b-1)*6*Ng+2)=Cm(3,2);
-                A(count,(g-1)*6+(b-1)*6*Ng+3)=Cm(3,3);
-            end
-            if SM(b,g+1)==1
-                A(count,(g)*6+(b-1)*6*Ng+1)=-Cf(3,1);
-                A(count,(g)*6+(b-1)*6*Ng+2)=-Cf(3,2);
-                A(count,(g)*6+(b-1)*6*Ng+3)=-Cf(3,3);   
-            else
-                A(count,(g)*6+(b-1)*6*Ng+1)=-Cm(3,1);
-                A(count,(g)*6+(b-1)*6*Ng+2)=-Cm(3,2);
-                A(count,(g)*6+(b-1)*6*Ng+3)=-Cm(3,3);
-            end
+            
+            matn = SM(b,g);
+                A(count,(g-1)*6+(b-1)*6*Ng+1)=Cn{matn}(3,1);
+                A(count,(g-1)*6+(b-1)*6*Ng+2)=Cn{matn}(3,2);
+                A(count,(g-1)*6+(b-1)*6*Ng+3)=Cn{matn}(3,3);    
+                        
+            matm = SM(b,g+1);
+                A(count,(g)*6+(b-1)*6*Ng+1)=-Cn{matm}(3,1);
+                A(count,(g)*6+(b-1)*6*Ng+2)=-Cn{matm}(3,2);
+                A(count,(g)*6+(b-1)*6*Ng+3)=-Cn{matm}(3,3);   
+
             count = count + 1;
         end
     end
     %r12
     for g = 1:Ng
         for b = 1:(Nb-1)
-            if SM(b,g)==1
-                A(count,(g-1)*6+(b-1)*6*Ng+6)=Cf(6,6);            
-            else
-                A(count,(g-1)*6+(b-1)*6*Ng+6)=Cm(6,6);
-            end
-            if SM(b+1,g)==1
-                A(count,(g-1)*6+(b)*6*Ng+6)=-Cf(6,6);
-            else
-                A(count,(g-1)*6+(b)*6*Ng+6)=-Cm(6,6);
-            end
+            
+            matn = SM(b,g);
+                A(count,(g-1)*6+(b-1)*6*Ng+6)=Cn{matn}(6,6);
+                
+            matm = SM(b+1,g);
+                A(count,(g-1)*6+(b)*6*Ng+6)=-Cn{matm}(6,6);
+
             count = count + 1;
         end
     end
     %r13
     for b = 1:Nb
         for g = 1:(Ng-1)
-            if SM(b,g)==1
-                A(count,(g-1)*6+(b-1)*6*Ng+5)=Cf(5,5);            
-            else
-                A(count,(g-1)*6+(b-1)*6*Ng+5)=Cm(5,5);
-            end
-            if SM(b,g+1)==1
-                A(count,(g)*6+(b-1)*6*Ng+5)=-Cf(5,5);
-            else
-                A(count,(g)*6+(b-1)*6*Ng+5)=-Cm(5,5);
-            end
+                       
+            matn = SM(b,g);
+                A(count,(g-1)*6+(b-1)*6*Ng+5)=Cn{matn}(5,5);            
+
+            matm = SM(b,g+1);
+                A(count,(g)*6+(b-1)*6*Ng+5)=-Cn{matm}(5,5);
+
             count = count + 1;
         end
     end
     %r23
     for g = 1:Ng
         for b = 1:(Nb-1)
-            if SM(b,g)==1
-                A(count,(g-1)*6+(b-1)*6*Ng+4)=Cf(4,4);            
-            else
-                A(count,(g-1)*6+(b-1)*6*Ng+4)=Cm(4,4);
-            end
-            if SM(b+1,g)==1
-                A(count,(g-1)*6+(b)*6*Ng+4)=-Cf(4,4);
-            else
-                A(count,(g-1)*6+(b)*6*Ng+4)=-Cm(4,4);
-            end
+            
+            matn = SM(b,g);
+                A(count,(g-1)*6+(b-1)*6*Ng+4)=Cn{matn}(4,4);            
+
+            matm = SM(b+1,g);
+                A(count,(g-1)*6+(b)*6*Ng+4)=-Cn{matm}(4,4);
+
             count = count + 1;
         end
     end
     for b = 1:Nb
         for g = 1:(Ng-1)
             if count<=Nb*Ng*6
-                if SM(b,g)==1
-                    A(count,(g-1)*6+(b-1)*6*Ng+4)=Cf(4,4);            
-                else
-                    A(count,(g-1)*6+(b-1)*6*Ng+4)=Cm(4,4);
-                end
-                if SM(b,g+1)==1
-                    A(count,(g)*6+(b-1)*6*Ng+4)=-Cf(4,4);
-                else
-                    A(count,(g)*6+(b-1)*6*Ng+4)=-Cm(4,4);
-                end
+                
+                matn = SM(b,g);
+                    A(count,(g-1)*6+(b-1)*6*Ng+4)=Cn{matn}(4,4);            
+
+                matm = SM(b,g+1);
+                    A(count,(g)*6+(b-1)*6*Ng+4)=-Cn{matm}(4,4);
+
                 count = count + 1;
             end
         end
@@ -271,11 +259,8 @@ for nl = 1:nloads
     for b=1:Nb
         for g=1:Ng
             i=(b-1)*Ng+g;
-            if SM(b,g)==1
-                C((6*i-5):(6*i),(6*i-5):(6*i))=Cf;
-            else
-                C((6*i-5):(6*i),(6*i-5):(6*i))=Cm;
-            end
+            matn = SM(b,g);
+                C((6*i-5):(6*i),(6*i-5):(6*i))=Cn{matn};
         end
     end
     rsub = C*esub;
@@ -323,6 +308,7 @@ for nl = 1:nloads
     
     
     % output to file
+    
     
 end % loading
 end
