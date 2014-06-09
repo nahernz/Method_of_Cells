@@ -54,7 +54,14 @@ if ismember(amod,[1 2 3])
 elseif amod == 4
     L = arch.l;
     H = arch.h;
-    SM = arch.sm;
+    
+    c = 1;
+    for i = 1:size(L,2)
+        for j = 1:size(H,2)           
+            SM(i,j) = arch.sm(c);
+            c = c+1;
+        end
+    end
 end    
 
 Ng = size(L,2);
@@ -63,52 +70,29 @@ l(1,1)=L(1,1)/2;
 for i=2:Ng
     l(1,i)=sum(L(1,1:i-1))+L(1,i)/2;
 end
-    H=[1/sqrt(3),1-1/sqrt(3)];
-    %H=[1/(2*sqrt(3)),1/(2*sqrt(3)),(1-1/sqrt(3))/2,(1-1/sqrt(3))/2];
-    %H=[1/(4*sqrt(3)),1/(4*sqrt(3)),1/(4*sqrt(3)),1/(4*sqrt(3)),(1-1/sqrt(3))/4,(1-1/sqrt(3))/4,(1-1/sqrt(3))/4,(1-1/sqrt(3))/4];
-    %H = [1/6,1/6,1/6,1/6,1/6,1/6];
-    %H = [x/2,1/2-x,x/2,x/2,1/2-x,x/2];
+
 Nb = size(H,2);
 h=zeros(1,Nb);
 h(1,1)=H(1,1)/2;
 for i=2:Nb
     h(1,i)=sum(H(1,1:i-1))+H(1,i)/2;
 end
-%grid (1 = fiber, 0 = matrix)
-     grid = [1,0;...
-         0,0];
-%     grid = [1,1,0,0;...
-%         1,1,0,0;...
-%         0,0,0,0;...
-%         0,0,0,0];
-%     grid = [1,1,1,1,0,0,0,0;...
-%         1,1,1,1,0,0,0,0;...
-%         1,1,1,1,0,0,0,0;...
-%         1,1,1,1,0,0,0,0;...
-%         0,0,0,0,0,0,0,0;...
-%         0,0,0,0,0,0,0,0;...
-%         0,0,0,0,0,0,0,0;...
-%         0,0,0,0,0,0,0,0];
-%     grid = [1,0,0,1;...
-%         0,0,0,0;...
-%         0,1,1,0;...
-%         0,1,1,0;...
-%         0,0,0,0;...
-%         1,0,0,1];
-%     grid = [1,1,0,0,1,1;... 
-%         0,0,0,0,0,0;...
-%         0,1,1,1,1,0;...
-%         0,1,1,1,1,0;...
-%         0,0,0,0,0,0;...
-%         1,1,0,0,1,1];
-%     
+
+
 %GIVENS
-ex = .005;
-ey = .005;
+ex = 0;
+ey = 0;
 ez = 0;
-exy = .01;
-exz = 0;
+exy = 0;
 eyz = 0;
+exz = 0;
+
+lmod = load.lmod;
+nloads = load.nl;
+loads = load.l;
+
+% create loop for each load, assign strains for each load, compute outputs
+    
 eglobal = [ez;ex;ey;exy;eyz;exz];
  
 %CREATE MATRICES --------------------------------- 
@@ -167,7 +151,7 @@ A
 %r22
 for g = 1:Ng
     for b = 1:(Nb-1)
-        if grid(b,g)==1
+        if SM(b,g)==1
             A(count,(g-1)*6+(b-1)*6*Ng+1)=Cf(2,1);
             A(count,(g-1)*6+(b-1)*6*Ng+2)=Cf(2,2);
             A(count,(g-1)*6+(b-1)*6*Ng+3)=Cf(2,3);           
@@ -176,7 +160,7 @@ for g = 1:Ng
             A(count,(g-1)*6+(b-1)*6*Ng+2)=Cm(2,2);
             A(count,(g-1)*6+(b-1)*6*Ng+3)=Cm(2,3);
         end
-        if grid(b+1,g)==1
+        if SM(b+1,g)==1
             A(count,(g-1)*6+(b)*6*Ng+1)=-Cf(2,1);
             A(count,(g-1)*6+(b)*6*Ng+2)=-Cf(2,2);
             A(count,(g-1)*6+(b)*6*Ng+3)=-Cf(2,3);
@@ -191,7 +175,7 @@ end
 %r33
 for b = 1:Nb
     for g = 1:(Ng-1)
-        if grid(b,g)==1
+        if SM(b,g)==1
             A(count,(g-1)*6+(b-1)*6*Ng+1)=Cf(3,1);
             A(count,(g-1)*6+(b-1)*6*Ng+2)=Cf(3,2);
             A(count,(g-1)*6+(b-1)*6*Ng+3)=Cf(3,3);    
@@ -200,7 +184,7 @@ for b = 1:Nb
             A(count,(g-1)*6+(b-1)*6*Ng+2)=Cm(3,2);
             A(count,(g-1)*6+(b-1)*6*Ng+3)=Cm(3,3);
         end
-        if grid(b,g+1)==1
+        if SM(b,g+1)==1
             A(count,(g)*6+(b-1)*6*Ng+1)=-Cf(3,1);
             A(count,(g)*6+(b-1)*6*Ng+2)=-Cf(3,2);
             A(count,(g)*6+(b-1)*6*Ng+3)=-Cf(3,3);   
@@ -215,12 +199,12 @@ end
 %r12
 for g = 1:Ng
     for b = 1:(Nb-1)
-        if grid(b,g)==1
+        if SM(b,g)==1
             A(count,(g-1)*6+(b-1)*6*Ng+6)=Cf(6,6);            
         else
             A(count,(g-1)*6+(b-1)*6*Ng+6)=Cm(6,6);
         end
-        if grid(b+1,g)==1
+        if SM(b+1,g)==1
             A(count,(g-1)*6+(b)*6*Ng+6)=-Cf(6,6);
         else
             A(count,(g-1)*6+(b)*6*Ng+6)=-Cm(6,6);
@@ -231,12 +215,12 @@ end
 %r13
 for b = 1:Nb
     for g = 1:(Ng-1)
-        if grid(b,g)==1
+        if SM(b,g)==1
             A(count,(g-1)*6+(b-1)*6*Ng+5)=Cf(5,5);            
         else
             A(count,(g-1)*6+(b-1)*6*Ng+5)=Cm(5,5);
         end
-        if grid(b,g+1)==1
+        if SM(b,g+1)==1
             A(count,(g)*6+(b-1)*6*Ng+5)=-Cf(5,5);
         else
             A(count,(g)*6+(b-1)*6*Ng+5)=-Cm(5,5);
@@ -247,12 +231,12 @@ end
 %r23
 for g = 1:Ng
     for b = 1:(Nb-1)
-        if grid(b,g)==1
+        if SM(b,g)==1
             A(count,(g-1)*6+(b-1)*6*Ng+4)=Cf(4,4);            
         else
             A(count,(g-1)*6+(b-1)*6*Ng+4)=Cm(4,4);
         end
-        if grid(b+1,g)==1
+        if SM(b+1,g)==1
             A(count,(g-1)*6+(b)*6*Ng+4)=-Cf(4,4);
         else
             A(count,(g-1)*6+(b)*6*Ng+4)=-Cm(4,4);
@@ -263,12 +247,12 @@ end
 for b = 1:Nb
     for g = 1:(Ng-1)
         if count<=Nb*Ng*6
-            if grid(b,g)==1
+            if SM(b,g)==1
                 A(count,(g-1)*6+(b-1)*6*Ng+4)=Cf(4,4);            
             else
                 A(count,(g-1)*6+(b-1)*6*Ng+4)=Cm(4,4);
             end
-            if grid(b,g+1)==1
+            if SM(b,g+1)==1
                 A(count,(g)*6+(b-1)*6*Ng+4)=-Cf(4,4);
             else
                 A(count,(g)*6+(b-1)*6*Ng+4)=-Cm(4,4);
@@ -284,7 +268,7 @@ C=zeros(Nb*Ng*6,Nb*Ng*6);
 for b=1:Nb
     for g=1:Ng
         i=(b-1)*Ng+g;
-        if grid(b,g)==1
+        if SM(b,g)==1
             C((6*i-5):(6*i),(6*i-5):(6*i))=Cf;
         else
             C((6*i-5):(6*i),(6*i-5):(6*i))=Cm;
