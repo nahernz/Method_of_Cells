@@ -93,8 +93,9 @@ loads = load.l;
 
 % create loop for each load, assign strains for each load, compute outputs
 
+for nl = 1:nloads
     
-eglobal = [ez;ex;ey;exy;eyz;exz];
+    eglobal = [ez;ex;ey;exy;eyz;exz];
  
     %CREATE MATRICES
     A = zeros(Ng*Nb*6,Ng*Nb*6);
