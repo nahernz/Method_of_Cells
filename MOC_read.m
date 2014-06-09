@@ -40,8 +40,8 @@ function mat = constituents(fid)
     if cmod == 1
         mat{matnum}.E11 = fscanf(fid,'EA=%e\n',1);
         mat{matnum}.E22 = fscanf(fid,'ET=%e\n',1);
-        mat{matnum}.V11 = fscanf(fid,'NUA=%f\n',1);
-        mat{matnum}.V22 = fscanf(fid,'NUT=%f\n',1);
+        mat{matnum}.V23 = fscanf(fid,'NUA=%f\n',1);
+        mat{matnum}.V12 = fscanf(fid,'NUT=%f\n',1);
         mat{matnum}.G23 = fscanf(fid,'GA=%e\n',1);
         mat{matnum}.G12 = fscanf(fid,'GT=%e\n',1);
     elseif cmod == 2

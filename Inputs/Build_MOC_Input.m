@@ -8,11 +8,9 @@ function Build_MOC_Input
 % by Michael Kaplan
 
 % create the filespace
-mkdir('Inputs');
-cd('Inputs');
+
 filename = 'input003.moc';
 fid = fopen(filename,'w+');
-cd('../');
 
 % create the input header
 fprintf(fid,'%% MOC Input: %s\n',filename);

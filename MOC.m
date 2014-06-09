@@ -4,56 +4,59 @@ inputfile = 'Inputs/input003.moc';
 
 [mat,arch,load] = MOC_read(inputfile)
 
+
+% Materials
 nmat = size(mat,1);
 Cn = cell(nmat,1);
-
-% %CONSTANTS
-% %material constants
-% E11f = 231*10^9;
-% E22f = 15*10^9;
-% v12f = .14;
-% G12f = 24*10^9;
-% G23f = 5.01*10^9;
-% Em = 3*10^9;
-% vm = .36;
-% v23f = (E22f/(2*G23f))-1;
-% delf = E22f*v12f^2+E11f*(v23f-1);
-% Cf = [E11f^2*(v23f-1)/delf,-E11f*E22f*v12f/delf,-E11f*E22f*v12f/delf,0,0,0;...
-%     -E11f*E22f*v12f/delf, E22f*(E22f*v12f^2-E11f)/((1+v23f)*delf),-E22f*(E22f*v12f^2+E11f*v23f)/((1+v23f)*delf),0,0,0; ...
-%     -E11f*E22f*v12f/delf,-E22f*(E22f*v12f^2+E11f*v23f)/((1+v23f)*delf), E22f*(E22f*v12f^2-E11f)/((1+v23f)*delf),0,0,0;...
-%     0,0,0,2*G23f,0,0;...
-%     0,0,0,0,2*G12f,0;...
-%     0,0,0,0,0,2*G12f];
-% c1 = Em*vm/((1+vm)*(1-2*vm));
-% c2 = Em/(2*(1+vm));
-% Cm = [c1+2*c2,c1,c1,0,0,0;...
-%     c1,c1+2*c2,c1,0,0,0;...
-%     c1,c1,c1+2*c2,0,0,0;...
-%     0,0,0,c2,0,0;...
-%     0,0,0,0,c2,0;...
-%     0,0,0,0,0,c2];
 
 % Build the C matrix depending on the 
 for i = 1:nmat
     cmod = mat{i}.cmod;
     if cmod == 1
+        E11 = mat{i}.E11;
+        E22 = mat{i}.E22;
+        v23 = mat{i}.V23;
+        v12 = mat{i}.V12;
+        G23 = mat{i}.G23;
+        G12 = mat{i}.G12;
         
-        Cn{i} 
+        
+        del = E22*v12^2+E11*(v23-1);
+        Cn{i} = [E11^2*(v23-1)/del,-E11*E22*v12/del,-E11*E22*v12/del,0,0,0;
+                -E11*E22*v12/del, E22*(E22*v12^2-E11)/((1+v23)*del),-E22*(E22*v12^2+E11*v23)/((1+v23)*del),0,0,0; 
+                -E11*E22*v12/del,-E22*(E22*v12^2+E11*v23)/((1+v23)*del), E22*(E22*v12^2-E11)/((1+v23)*del),0,0,0;
+                0,0,0,2*G23,0,0;
+                0,0,0,0,2*G12,0;
+                0,0,0,0,0,2*G12];
+            
     elseif cmod == 2
+        E = mat{i}.E;
+        v = mat{i}.V;
         
-        Cn{i}
+        c1 = E*v/((1+v)*(1-2*v));
+        c2 = E/(2*(1+v));
+        Cn{i} = [c1+2*c2,c1,c1,0,0,0;
+                 c1,c1+2*c2,c1,0,0,0;
+                 c1,c1,c1+2*c2,0,0,0;
+                 0,0,0,c2,0,0;
+                 0,0,0,0,c2,0;
+                 0,0,0,0,0,c2];
     end
 end
     
 
+% Cell Architecture
+amod = arch.amod;
 
-%lengths
-    L=[1/sqrt(3),1-1/sqrt(3)];
-    %L=[1/(2*sqrt(3)),1/(2*sqrt(3)),(1-1/sqrt(3))/2,(1-1/sqrt(3))/2];
-    %L=[1/(4*sqrt(3)),1/(4*sqrt(3)),1/(4*sqrt(3)),1/(4*sqrt(3)),(1-1/sqrt(3))/4,(1-1/sqrt(3))/4,(1-1/sqrt(3))/4,(1-1/sqrt(3))/4];
-    %L = [1/(4*sqrt(3)),1/(4*sqrt(3)),1/(4*sqrt(3)),1/(4*sqrt(3))];
-    %x=sqrt(1/(6*sqrt(3)));
-    %L = [1/(sqrt(3)*2)-x/2,x-1/(sqrt(3)*2),(1/sqrt(3)-x)/2,(1/sqrt(3)-x)/2,x-1/(sqrt(3)*2),1/(sqrt(3)*2)-x/2];
+if ismember(amod,[1 2 3])
+    error('myApp:argChk', 'ADD FUNCTIONALITY FOR PREDEFINED ARCHITECTURES')
+    
+elseif amod == 4
+    L = arch.l;
+    H = arch.h;
+    SM = arch.sm;
+end    
+
 Ng = size(L,2);
 l=zeros(1,Ng);
 l(1,1)=L(1,1)/2;
