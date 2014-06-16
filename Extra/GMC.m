@@ -79,9 +79,9 @@ end
 %     
 %GIVENS
 ex = .005;
-ey = .005;
+ey = 0;
 ez = 0;
-exy = .01;
+exy = 0;
 exz = 0;
 eyz = 0;
 eglobal = [ez;ex;ey;exy;eyz;exz];
@@ -137,7 +137,7 @@ for g = 1:Ng
 end
 K(count,4) = sum(H)*sum(L);
 count = count + 1;
-A
+A;
 %Am
 %r22
 for g = 1:Ng
@@ -307,21 +307,24 @@ for b=1:Nb
         r12(b,g) = rsub((g-1)*6+(b-1)*6*Ng+6,1);
     end
 end
-figure(1)
-contour(l,h,e2);
-title('E22');
-figure(2)
-contour(l,h,e3);
-title('E33');
-figure(3)
-contour(l,h,e23);
-title('E23');
-figure(4)
-contour(l,h,r2);
-title('S22');
-figure(5)
-contour(l,h,r3);
-title('S33');
-figure(6)
-contour(l,h,r23);
-title('S23');
+    s = [r1;r2;r3;r23;r13;r12]
+    e = [e1;e2;e3;e23;e13;e12]
+    
+% figure(1)
+% contour(l,h,e2);
+% title('E22');
+% figure(2)
+% contour(l,h,e3);
+% title('E33');
+% figure(3)
+% contour(l,h,e23);
+% title('E23');
+% figure(4)
+% contour(l,h,r2);
+% title('S22');
+% figure(5)
+% contour(l,h,r3);
+% title('S33');
+% figure(6)
+% contour(l,h,r23);
+% title('S23');

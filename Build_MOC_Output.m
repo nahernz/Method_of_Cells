@@ -10,7 +10,7 @@ function Build_MOC_Output(input_file, C_matrix)
 
 % Create the filename for the output
 filename = strcat(input_file, '.moco');
-fid = fopen(filename, 'w+');
+fid = fopen(filename, 'a');
 
 % create the input header
 fprintf(fid, '%% MOC Output: %s\n', filename);
@@ -22,8 +22,8 @@ fprintf(fid,'%% Created: %s\n%%\n',time);
 %--------------------------------------------------------------------------
 
 fprintf(fid,'*C Matrix: \n');
-for int i=1:
-fprintf(fid, 'C_matrix=%', \n);
+
+fprintf(fid, 'C_matrix=%10.6e', \n);
 
 
 

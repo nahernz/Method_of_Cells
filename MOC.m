@@ -1,6 +1,7 @@
-function [C,s,e] = MOC(inputfile)
+function [C,s,e] = MOC(input)
 
-inputfile = 'Inputs/input003.moc';
+input = 'input003';
+inputfile = ['Inputs/',input,'.moci'];
 
 [mat,arch,load] = MOC_read(inputfile);
 
@@ -62,7 +63,6 @@ elseif amod == 4
             c = c+1;
         end
     end
-    SM
 end    
 
 Ng = size(L,2);
@@ -109,15 +109,16 @@ for nl = 1:nloads
         
     end
     
-    eglobal = [ez;ex;ey;exy;eyz;exz];
+    eglobal = [ex;ey;ez;eyz;exz;exy];
  
     %CREATE MATRICES
+
     A = zeros(Ng*Nb*6,Ng*Nb*6);
     K = zeros(Ng*Nb*6,6);
     count = 1;
     %Ag and J
+   
     %e33
-
     for b = 1:Nb
         for g = 1:Ng
             A(count,(g-1)*6+(b-1)*6*Ng+3)=L(1,g);
@@ -163,7 +164,7 @@ for nl = 1:nloads
     end
     K(count,4) = sum(H)*sum(L);
     count = count + 1;
-    
+
     %Am
     %r22
     for g = 1:Ng
@@ -253,6 +254,181 @@ for nl = 1:nloads
         end
     end
     %SOLVE
+    %}
+    
+    %{
+    %----------------------------------------------
+    %                 try it my self
+    %----------------------------------------------
+    % strain vector looks like:
+    %
+    % [e(11) e(12) e(13) e(14) e(21) ... e(NbNg)] transposed
+    % loop through gammas then betas
+    
+    % e22 (Paley eqn. 35)
+    for g = 1:Ng
+        for b = 1:Nb
+            spot = (g-1)*6+(b-1)*6*Ng;
+            Ag(count,spot+2) = H(b);
+        end
+        J(count,2) = sum(H);
+        count = count+1;
+    end
+    
+    % e33 (Paley eqn. 36)
+    for b = 1:Nb
+        for g = 1:Ng
+            spot = (g-1)*6+(b-1)*6*Ng;
+            Ag(count,spot+3) = L(g);
+        end
+        J(count,3) = sum(L);
+        count = count+1;
+    end
+    
+    % 2*e12 (Paley eqn. 39)
+    for g = 1:Ng
+        for b = 1:Nb
+            spot = (g-1)*6+(b-1)*6*Ng;
+            Ag(count,spot+6) = H(b);
+        end
+        J(count,6) = sum(H);
+        count = count+1;
+    end
+    
+    % 2*e13 (Paley eqn. 40)
+    for b = 1:Nb
+        for g = 1:Ng
+            spot = (g-1)*6+(b-1)*6*Ng;
+            Ag(count,spot+5) = L(g);
+        end
+        J(count,5) = sum(L);
+        count = count+1;
+    end
+    
+    % 2*e23 (Paley eqn. 32)
+    for b = 1:Nb
+        for g = 1:Ng
+            spot = (g-1)*6+(b-1)*6*Ng;
+            Ag(count,spot+4) = (H(b)*L(g))/(sum(H)*sum(L));
+        end        
+    end
+    J(count,4) = 1;
+    count = count+1;
+    
+    % e11 (e11(bg) = e11(avg))
+    for b = 1:Nb
+        for g = 1:Ng
+            spot = (g-1)*6+(b-1)*6*Ng;
+            Ag(count,spot+1) = 1;
+            J(count,1) = 1;
+            count = count+1;
+        end        
+    end
+    
+    % build Am
+    count = 1;
+    
+    %r22
+    for g = 1:Ng
+        for b = 1:(Nb-1)
+            spot = (g-1)*6+(b-1)*6*Ng;
+            matn = SM(b,g);
+                Am(count,(g-1)*6+(b-1)*6*Ng+1)=Cn{matn}(2,1);
+                Am(count,(g-1)*6+(b-1)*6*Ng+2)=Cn{matn}(2,2);
+                Am(count,(g-1)*6+(b-1)*6*Ng+3)=Cn{matn}(2,3);    
+                        
+            matm = SM(b+1,g);
+                Am(count,(g-1)*6+(b)*6*Ng+1)=-Cn{matm}(2,1);
+                Am(count,(g-1)*6+(b)*6*Ng+2)=-Cn{matm}(2,2);
+                Am(count,(g-1)*6+(b)*6*Ng+3)=-Cn{matm}(2,3);   
+
+            count = count + 1;
+        end
+    end
+    
+    %r33
+    for b = 1:Nb
+        for g = 1:(Ng-1)
+            
+            matn = SM(b,g);
+                Am(count,(g-1)*6+(b-1)*6*Ng+1)=Cn{matn}(3,1);
+                Am(count,(g-1)*6+(b-1)*6*Ng+2)=Cn{matn}(3,2);
+                Am(count,(g-1)*6+(b-1)*6*Ng+3)=Cn{matn}(3,3);    
+                        
+            matm = SM(b,g+1);
+                Am(count,(g)*6+(b-1)*6*Ng+1)=-Cn{matm}(3,1);
+                Am(count,(g)*6+(b-1)*6*Ng+2)=-Cn{matm}(3,2);
+                Am(count,(g)*6+(b-1)*6*Ng+3)=-Cn{matm}(3,3);   
+
+            count = count + 1;
+        end
+    end
+    
+    %r12
+    for g = 1:Ng
+        for b = 1:(Nb-1)
+            
+            matn = SM(b,g);
+                Am(count,(g-1)*6+(b-1)*6*Ng+6)=Cn{matn}(6,6);
+                
+            matm = SM(b+1,g);
+                Am(count,(g-1)*6+(b)*6*Ng+6)=-Cn{matm}(6,6);
+
+            count = count + 1;
+        end
+    end
+    
+    %r13
+    for b = 1:Nb
+        for g = 1:(Ng-1)
+                       
+            matn = SM(b,g);
+                Am(count,(g-1)*6+(b-1)*6*Ng+5)=Cn{matn}(5,5);            
+
+            matm = SM(b,g+1);
+                Am(count,(g)*6+(b-1)*6*Ng+5)=-Cn{matm}(5,5);
+
+            count = count + 1;
+        end
+    end
+    
+    %r23
+    for g = 1:Ng
+        for b = 1:(Nb-1)
+            
+            matn = SM(b,g);
+                Am(count,(g-1)*6+(b-1)*6*Ng+4)=Cn{matn}(4,4);            
+
+            matm = SM(b+1,g);
+                Am(count,(g-1)*6+(b)*6*Ng+4)=-Cn{matm}(4,4);
+
+            count = count + 1;
+        end
+    end
+    
+    %r32
+%     for b = 1:Nb
+%         for g = 1:(Ng-1)
+%             if count<=Nb*Ng*6
+%                 
+%                 matn = SM(b,g);
+%                     Am(count,(g-1)*6+(b-1)*6*Ng+4)=Cn{matn}(4,4);            
+% 
+%                 matm = SM(b,g+1);
+%                     Am(count,(g)*6+(b-1)*6*Ng+4)=-Cn{matm}(4,4);
+% 
+%                 count = count + 1;
+%             end
+%         end
+%     end
+    
+    %SOLVE
+    A = [Am;Ag]
+    K = [zeros(5*(Nb*Ng)-2*(Nb+Ng)-1,6);J];
+    
+    %----------------------------------------------
+    %}
+    
     B = A\K;
     esub = B*eglobal;
     C=zeros(Nb*Ng*6,Nb*Ng*6);
@@ -304,7 +480,8 @@ for nl = 1:nloads
             r12(b,g) = rsub((g-1)*6+(b-1)*6*Ng+6,1);
         end
     end
-    
+    s = [r1;r2;r3;r23;r13;r12];
+    e = [e1;e2;e3;e23;e13;e12];
     
     
     % output to file
