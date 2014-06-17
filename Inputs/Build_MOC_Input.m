@@ -9,7 +9,7 @@ function Build_MOC_Input
 
 % create the filespace
 
-filename = 'input003.moc';
+filename = 'input004.moci';
 fid = fopen(filename,'w+');
 
 % create the input header
@@ -109,7 +109,7 @@ end
 
 fprintf(fid,'*CELL\n');
 
-amod = 4;
+amod = 2;
 %   1 = 4 cell square
 %   2 = fiber centered square
 %   3 = hex packed rectangle 
@@ -191,7 +191,7 @@ lmod = 1;
 %   add other cases
 
 if lmod == 1 % axial strain
-    loads = [1e-3,2e-3]; 
+    loads = [1e-3]; 
     Nloads = size(loads,2);
     
     fprintf(fid,'LMOD=%i\n',lmod);

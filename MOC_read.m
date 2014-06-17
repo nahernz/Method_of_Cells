@@ -73,12 +73,86 @@ function arch = architecture(fid)
 
     arch.amod = fscanf(fid,'AMOD=%i\n',1);
     
-    if ismember(arch.amod,[1 2 3])
-        arch.vf = fscanf(fid,'VF=%f\n',1);
-        arch.df = fscanf(fid,'DF=%e\n',1);
+    if arch.amod == 1
+        % 4 cell square
+        vf = fscanf(fid,'VF=%f\n',1);
+        df = fscanf(fid,'DF=%e\n',1);
+        
+        arch.h(1) = sqrt(pi/4*df^2);
+        arch.h(2) = arch.h(1)/sqrt(vf)-arch.h(1);
+        arch.l = arch.h;
+        
+        arch.sm = [1 2; 2 2];
+        
+    elseif arch.amod == 2
+        % square symmetric element
+
+         
+        vf = fscanf(fid,'VF=%f\n',1);
+        df = fscanf(fid,'DF=%e\n',1);
+        
+        hn = [0, 0.1229, 0.1229, 0.4916, 0.1229, 0.1229, 0]; 
+        % fiber with unit area, scale by fiber area 
+        H  = (pi/4*df^2)*hn;
+        L = H;
+        
+        SM = [2,2,2,2,2,2,2;
+              2,2,2,1,2,2,2;
+              2,2,1,1,1,2,2;
+              2,1,1,1,1,1,2;
+              2,2,1,1,1,2,2;
+              2,2,2,1,2,2,2;
+              2,2,2,2,2,2,2];  
+
+        fiber  = 1;
+        matrix = 2;
+
+        % initialize the volumes
+        Vfiber  = 0;
+        Vmatrix = 0;
+
+        % calculate the inner square length
+        dx = sum(L);
+        dy = sum(H);
+
+        % loop over elements
+        for x = 1:size(L,2);
+            for y = 1:size(H,2);
+                if     SM(y,x) == fiber % calculate the volume of the fiber
+                    Vfiber = Vfiber + L(x)*H(y);
+                elseif SM(y,x) == matrix % calculate the volume of the surrounding matrix
+                    Vmatrix = Vmatrix + L(x)*H(y);
+                end
+            end
+        end
+        Vfiber/(Vfiber+Vmatrix);
+        
+
+
+
+            % Calculate the needed extra matrix volume
+            syms Vm_Needed
+            Vm_Needed = solve(vf == Vfiber/(Vfiber+Vmatrix+Vm_Needed),Vm_Needed);
+            Vm_Needed = eval(Vm_Needed);
+
+            % calculate the needed height and lengths of the surrounding matrix
+            syms T
+            T = solve(Vm_Needed==4*T^2+4*T*dx,T);
+            T = max(eval(T)); % the thickness of the surrounding membrane
+
+            % Complete the H and L vectors
+            H(1) = T;
+            H(end) = T;
+            L(1) = T;
+            L(end) = T;
+            
+        arch.h = H;
+        arch.l = L;
+        arch.sm = SM;
         
     elseif arch.amod == 4
         dim = fscanf(fid,'DIM=%i,%i,\n',2);
+        
         arch.h(1) = fscanf(fid,'H=%e,',1);
         for i = 2:dim(1)
             arch.h(i) = fscanf(fid,'%e,',1);
@@ -89,10 +163,15 @@ function arch = architecture(fid)
             arch.l(i) = fscanf(fid,'%e,',1);
         end
         fgets(fid);
-        arch.sm(1) = fscanf(fid,'SM=%e,',1);
-        for i = 2:dim(1)*dim(2)
-            arch.sm(i) = fscanf(fid,'%i,',1);
+        
+
+        fscanf(fid,'SM=',1);
+        for i = 1:dim(1)
+            for j = 1:dim(2)
+                arch.sm(i,j) = fscanf(fid,'%i,',1);
+            end            
         end
+        arch.sm
         fgets(fid);
         
     end

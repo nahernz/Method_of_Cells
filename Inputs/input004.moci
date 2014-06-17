@@ -1,5 +1,5 @@
-% MOC Input: input003.moc
-% Created: 03-Jun-2014 16:15:45
+% MOC Input: input004.moci
+% Created: 17-Jun-2014 13:36:10
 %
 *CONSTITUENTS
 NMATS=2
@@ -16,15 +16,13 @@ E=3.000e+09
 NU=0.360
 %
 *CELL
-AMOD=4
-DIM=2,2,
-H=1.000e+00,1.000e+00,
-L=1.000e+00,1.000e+00,
-SM=2,1,2,2,
+AMOD=2
+VF=0.750
+DF=5.000e-06
 %
 *LOADING
 LMOD=1
-NL=2
-L=0.00100,0.00200,
+NL=1
+L=0.00100,
 %
 *END

@@ -57,12 +57,7 @@ elseif amod == 4
     H = arch.h;
     
     c = 1;
-    for i = 1:size(L,2)
-        for j = 1:size(H,2)           
-            SM(i,j) = arch.sm(c);
-            c = c+1;
-        end
-    end
+    SM = arch.sm;
 end    
 
 Ng = size(L,2);
@@ -486,8 +481,6 @@ for nl = 1:nloads
     s = [r1;r2;r3;r23;r13;r12];
     e = [e1;e2;e3;e23;e13;e12];
     
-    s_avg = [mean(mean(r1));mean(mean(r2));mean(mean(r3));mean(mean(r23));mean(mean(r13));mean(mean(r12))]
-    e_avg = [mean(mean(e1));mean(mean(e2));mean(mean(e3));mean(mean(e23));mean(mean(e13));mean(mean(e12))]
     
     % output to file
     
