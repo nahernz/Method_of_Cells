@@ -9,7 +9,7 @@ function Build_MOC_Input
 
 % create the filespace
 
-filename = 'input004.moci';
+filename = 'FourCell_0.5_04.moci';
 fid = fopen(filename,'w+');
 
 % create the input header
@@ -33,12 +33,13 @@ cmod = 1;
 %   add other models later
 
 if cmod == 1
-    E11 = 231e9;   % Pa
-    E22 = 15e9;    % Pa
-    v12 = .14;     
-    G12 = 24e9;    % Pa
-    G23 = 5.01e9;  % Pa
-    v23 = (E22/(2*G23))-1;
+    E11 = 251e3;   % MPa
+    E22 = 40.4e3;    % MPa
+    v12 = .321;     
+    G12 = 30.7e3;    % MPa
+    v23 = 0.256;
+    G23 = 1/2*(E22/(v23+1));  % MPa
+    
     
     % write input
     fprintf(fid,'MAT=%i,CMOD=%i\n',mat,cmod);
@@ -52,7 +53,7 @@ if cmod == 1
 % add more material models here
 
 elseif cmod == 2
-    E = 3e9;   % Pa
+    E = 3e3;   % MPa
     v = .36;     
 
     
@@ -91,8 +92,8 @@ if cmod == 1
 % add more material models here
 
 elseif cmod == 2
-    E = 3e9;   % Pa
-    v = .36;     
+    E = 3.31e3;   % MPa
+    v = 0.318;     
 
     
     % write input
@@ -109,7 +110,7 @@ end
 
 fprintf(fid,'*CELL\n');
 
-amod = 2;
+amod = 1;
 %   1 = 4 cell square
 %   2 = fiber centered square
 %   3 = hex packed rectangle 
@@ -117,8 +118,8 @@ amod = 2;
 %   add other models
 
 if amod == 1
-    Vf = 0.75;  % fiber volume fraction
-    Df = 5e-6;   % fiber diameter (m)
+    Vf = 0.5;  % fiber volume fraction
+    Df = 5e-3;   % fiber diameter (mm)
     
     fprintf(fid,'AMOD=%i\n',amod);
     fprintf(fid,'VF=%0.3f\n',Vf);

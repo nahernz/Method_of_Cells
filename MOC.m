@@ -1,6 +1,7 @@
 function [C,s,e] = MOC(input)
 
-input = 'input003';
+
+input = 'FourCell_0.5_04';
 inputfile = ['Inputs/',input,'.moci'];
 
 [mat,arch,load] = MOC_read(inputfile);
@@ -49,14 +50,14 @@ end
 % Cell Architecture
 amod = arch.amod;
 
-if ismember(amod,[1 2 3])
+if amod == 3
     error('myApp:argChk', 'ADD FUNCTIONALITY FOR PREDEFINED ARCHITECTURES')
     
-elseif amod == 4
+else 
     L = arch.l;
     H = arch.h;
+
     
-    c = 1;
     SM = arch.sm;
 end    
 
@@ -423,8 +424,9 @@ for nl = 1:nloads
     
     %----------------------------------------------
     %}
-    
+
     B = A\K;
+    
     esub = B*eglobal;
     C=zeros(Nb*Ng*6,Nb*Ng*6);
     for b=1:Nb
@@ -436,7 +438,7 @@ for nl = 1:nloads
     end
     rsub = C*esub;
     
-   
+  %{ 
     for i=1:size(esub,1)
         if abs(rsub(i,1)) < 0.00001
             rsub(i,1) = 0;
@@ -445,6 +447,7 @@ for nl = 1:nloads
             esub(i,1) = 0;
         end
     end
+    %}
     
     e1=zeros(Nb,Ng);
     e2=zeros(Nb,Ng);
