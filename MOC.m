@@ -484,7 +484,24 @@ for nl = 1:nloads
     s = [r1;r2;r3;r23;r13;r12];
     e = [e1;e2;e3;e23;e13;e12];
     
+    s_avg = zeros(6,1);
+    e_avg = zeros(6,1);
+    V     = zeros(1,1);
     
+    for b=1:Nb
+        for g=1:Ng
+            sbg   = [r1(b,g);r2(b,g);r3(b,g);r23(b,g);r13(b,g);r12(b,g)];  % subcell stress
+            ebg   = [e1(b,g);e2(b,g);e3(b,g);e23(b,g);e13(b,g);e12(b,g)];  % subcell strain
+            Vbg   = H(b)*L(g);                                             % subcell volume
+            s_avg = s_avg + sbg*Vbg;
+            e_avg = e_avg + ebg*Vbg;
+            V     = V + Vbg;
+        end
+    end
+    s_avg = s_avg/V
+    e_avg = e_avg/V
+    
+    E11c = s_avg(1)/e_avg(1)
     % output to file
     
     
