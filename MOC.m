@@ -1,7 +1,7 @@
 function [C,s,e] = MOC(input)
 
 
-input = 'FourCell_0.5_04';
+input = 'FiberCentered_0.5_01';
 inputfile = ['Inputs/',input,'.moci'];
 
 [mat,arch,load] = MOC_read(inputfile);
@@ -51,14 +51,14 @@ end
 amod = arch.amod;
 
 if amod == 3
-    error('myApp:argChk', 'ADD FUNCTIONALITY FOR PREDEFINED ARCHITECTURES')
+    error('myApp:argChk', 'ADD FUNCTIONALITY FOR HEX PACKED RUC')
     
 else 
     L = arch.l;
     H = arch.h;
 
     
-    SM = arch.sm;
+    SM = arch.sm
 end    
 
 Ng = size(L,2);
@@ -502,6 +502,8 @@ for nl = 1:nloads
     e_avg = e_avg/V
     
     E11c = s_avg(1)/e_avg(1)
+    
+    Cell_Plot(r1,L,H)
     % output to file
     
     
