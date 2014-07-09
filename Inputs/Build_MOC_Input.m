@@ -9,7 +9,7 @@ function Build_MOC_Input
 
 % create the filespace
 
-filename = 'FiberCentered_0.5_01.moci';
+filename = 'FiberCentered_0.5_03_AS_ML.moci';
 fid = fopen(filename,'w+');
 
 % create the input header
@@ -201,7 +201,7 @@ if lmod == 1 % axial strain
     fprintf(fid,'\n');
     
 elseif lmod == 2 % tangential strain
-    loads = [1e-3,2e-3];
+    loads = [1e-3];
     Nloads = size(loads,2);
     
     fprintf(fid,'LMOD=%i\n',lmod);
@@ -224,11 +224,58 @@ elseif lmod == 3 % shear strain
     end
     fprintf(fid,'\n');
 end
+fprintf(fid,'%%\n');
+%--------------------------------------------------------------------------
+%                               MATLAB OUTPUTS
+%--------------------------------------------------------------------------
+if true
+    
+    % Matlab plots of stresses and strains
+    s = [1 2 4 5]; % s11 s22 s23 s13
+    e = [1 2 4 5]; % e11 e22 e23 e13
+    % print stiffnesses to workspace
+    E = [1 2 4 5]; % E11 E22 G23 G13
+    
+    fprintf(fid,'*MATLAB\n');
+    
+    Ns = size(s,2);
+    Ne = size(e,2);
+    NE = size(E,2);
+    
+    fprintf(fid,'NSE=%i\n',Ns);
+    if ~isempty(s)
+        fprintf(fid,'SE=');
+        for i = 1:size(s,2)
+            fprintf(fid,'%i,',s(i));
+        end
+        fprintf(fid,'\n');
+    end
+    
+    fprintf(fid,'NSA=%i\n',Ne);
+    if ~isempty(e)
+        fprintf(fid,'SA=');
+        for i = 1:size(e,2)
+            fprintf(fid,'%i,',e(i));
+        end
+        fprintf(fid,'\n');
+    end
+    
+    fprintf(fid,'NSF=%i\n',NE);
+    if ~isempty(E)
+        fprintf(fid,'SF=');
+        for i = 1:size(E,2)
+            fprintf(fid,'%i,',E(i));
+        end
+        fprintf(fid,'\n');
+    end           
+    
+end
+
 
 % end the input file
 
 fprintf(fid,'%%\n*END');
 fclose(fid);
 
-
+end
 

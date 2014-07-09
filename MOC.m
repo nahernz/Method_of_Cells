@@ -1,10 +1,11 @@
 function [C,s,e] = MOC(input)
 
+close all
 
-input = 'FiberCentered_0.5_01';
+input = 'FiberCentered_0.5_03_AS_ML';
 inputfile = ['Inputs/',input,'.moci'];
 
-[mat,arch,load] = MOC_read(inputfile);
+[mat,arch,load,matlab] = MOC_read(inputfile);
 
 
 % Materials
@@ -58,7 +59,7 @@ else
     H = arch.h;
 
     
-    SM = arch.sm
+    SM = arch.sm;
 end    
 
 Ng = size(L,2);
@@ -501,9 +502,51 @@ for nl = 1:nloads
     s_avg = s_avg/V
     e_avg = e_avg/V
     
-    E11c = s_avg(1)/e_avg(1)
+    E_avg = s_avg./e_avg
     
-    Cell_Plot(r1,L,H)
+    % plot and output matlab data
+    
+    StressTitles = {'Axial Stress (\sigma_1_1)','Transverse Stress (\sigma_2_2)',...
+        'Transverse Stress (\sigma_3_3)', 'Axial Shear Stress (\sigma_2_3)',...
+        'Transverse Shear Stress (\sigma_1_3)','Transverse Shear Stress (\sigma_1_2)'};
+    
+    StrainTitles = {'Axial Strain (\epsilon_1_1)','Transverse Strain (\epsilon_2_2)',...
+        'Transverse Strain (\epsilon_3_3)', 'Axial Shear Strain (\epsilon_2_3)',...
+        'Transverse Shear Strain (\epsilon_1_3)','Transverse Shear Strain (\epsilon_1_2)'};
+    
+    StiffTitles = {'Axial Stiffness (E_1_1)','Transverse Stiffness (E_2_2)',...
+        'Transverse Stiffness (E_3_3)','Axial Shear Stiffness (G_2_3)',...
+        'Transverse Shear Stiffness (G_1_3)','Transverse Shear Stiffness (G_1_2)'};
+    
+    for i = 1:matlab.ns
+        
+        if     matlab.s(i)== 1; P_var = r1;
+        elseif matlab.s(i)== 2; P_var = r2;
+        elseif matlab.s(i)== 3; P_var = r3;
+        elseif matlab.s(i)== 4; P_var = r23;
+        elseif matlab.s(i)== 5; P_var = r13;    
+        elseif matlab.s(i)== 6; P_var = r12;
+        end
+        
+        Cell_Plot(P_var,L,H)
+        title(StressTitles{matlab.s(i)})
+    end
+        
+    for i = 1:matlab.ne
+        
+        if     matlab.e(i)== 1; P_var = e1;
+        elseif matlab.e(i)== 2; P_var = e2;
+        elseif matlab.e(i)== 3; P_var = e3;
+        elseif matlab.e(i)== 4; P_var = e23;
+        elseif matlab.e(i)== 5; P_var = e13;    
+        elseif matlab.e(i)== 6; P_var = e12;
+        end
+        
+        Cell_Plot(P_var,L,H)
+        title(StrainTitles{matlab.e(i)})
+    end
+    
+    
     % output to file
     
     

@@ -21,11 +21,11 @@ end
 V = zeros(size(value)+1);
 V(1:end-1,1:end-1) = value;
 
-H
-
-figure(1)
+figure
 pcolor(X,Y,V)
-colorbar
-
+h = colorbar;
+xlabel(h,'MPa')
+axis equal
+axis tight
 end
 

@@ -1,4 +1,4 @@
-function [mat,arch,load] = MOC_read(inputfile)
+function [mat,arch,load,out] = MOC_read(inputfile)
 
     fid = fopen(inputfile,'r');
 
@@ -17,6 +17,9 @@ function [mat,arch,load] = MOC_read(inputfile)
         elseif ~isempty(strfind(s,'*LOADING'))
             load = loading(fid);
                 
+        elseif ~isempty(strfind(s,'*MATLAB'))
+            out = output(fid);
+            
         elseif ~isempty(strfind(s,'*END'))
             return
         
@@ -130,16 +133,12 @@ function arch = architecture(fid)
 
 
 
-            % Calculate the needed extra matrix volume
-            syms Vm_Needed
-            Vm_Needed = solve(vf == Vfiber/(Vfiber+Vmatrix+Vm_Needed),Vm_Needed);
-            Vm_Needed = eval(Vm_Needed);
+            % Calculate the needed extra matrix volume            
+            Vm_Needed = Vfiber*(1-vf)/vf-Vmatrix;
 
             % calculate the needed height and lengths of the surrounding matrix
-            syms T
-            T = solve(Vm_Needed==4*T^2+4*T*dx,T);
-            T = max(eval(T)); % the thickness of the surrounding membrane
-
+            
+            T = sqrt(dx^2+Vm_Needed)/2 - dx/2; % the thickness of the surrounding membrane
             % Complete the H and L vectors
             H(1) = T;
             H(end) = T;
@@ -192,5 +191,30 @@ function load = loading(fid)
     else
         % add general loading here
     end
+end
+
+function matlab = output(fid)
+
+    matlab.ns = fscanf(fid,'NSE=%i\n',1);  
+    matlab.s(1) = fscanf(fid,'SE=%i,',1);
+    for i = 2:matlab.ns
+        matlab.s(i) = fscanf(fid,'%i,',1);
+    end
+    fgets(fid);
+    
+    matlab.ne = fscanf(fid,'NSA=%i\n',1);   
+    matlab.e(1) = fscanf(fid,'SA=%i,',1);
+    for i = 2:matlab.ne
+        matlab.e(i) = fscanf(fid,'%i,',1);
+    end
+    fgets(fid);
+    
+    matlab.nE = fscanf(fid,'NSF=%i\n',1);   
+    matlab.E(1) = fscanf(fid,'SF=%i,',1);
+    for i = 2:matlab.nE
+        matlab.E(i) = fscanf(fid,'%i,',1);
+    end
+    fgets(fid);
+    
 end
 
