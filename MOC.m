@@ -2,7 +2,7 @@ function [C,s,e] = MOC(input)
 
 close all
 
-input = 'FiberCentered_0.5_03_AS_ML';
+input = 'Fourcell_0.5_01_AS_ML';
 inputfile = ['Inputs/',input,'.moci'];
 
 [mat,arch,load,matlab] = MOC_read(inputfile);
@@ -485,9 +485,10 @@ for nl = 1:nloads
     s = [r1;r2;r3;r23;r13;r12];
     e = [e1;e2;e3;e23;e13;e12];
     
-    s_avg = zeros(6,1);
-    e_avg = zeros(6,1);
-    V     = zeros(1,1);
+    s_avg  = zeros(6,1);
+    e_avg  = zeros(6,1);
+    C_star = zeros(6,6);
+    V      = zeros(1,1);
     
     for b=1:Nb
         for g=1:Ng
@@ -499,10 +500,22 @@ for nl = 1:nloads
             V     = V + Vbg;
         end
     end
+    B
+    i = 1;
+    for b=1:Nb
+        for g=1:Ng
+            matn = SM(b,g);
+            B((i-1)*6+1:(i)*6,1:6)
+            C_star = C_star + H(b)*L(g)*Cn{matn}*B((i-1)*6+1:(i)*6,1:6);
+            i = i + 1;
+            
+        end
+    end
+C_star
+    C_star*eglobal
     s_avg = s_avg/V
     e_avg = e_avg/V
     
-    E_avg = s_avg./e_avg
     
     % plot and output matlab data
     
@@ -517,33 +530,37 @@ for nl = 1:nloads
     StiffTitles = {'Axial Stiffness (E_1_1)','Transverse Stiffness (E_2_2)',...
         'Transverse Stiffness (E_3_3)','Axial Shear Stiffness (G_2_3)',...
         'Transverse Shear Stiffness (G_1_3)','Transverse Shear Stiffness (G_1_2)'};
-    
-    for i = 1:matlab.ns
-        
-        if     matlab.s(i)== 1; P_var = r1;
-        elseif matlab.s(i)== 2; P_var = r2;
-        elseif matlab.s(i)== 3; P_var = r3;
-        elseif matlab.s(i)== 4; P_var = r23;
-        elseif matlab.s(i)== 5; P_var = r13;    
-        elseif matlab.s(i)== 6; P_var = r12;
+
+    if isfield(matlab,'ns')
+        for i = 1:matlab.ns
+
+            if     matlab.s(i)== 1; P_var = r1;
+            elseif matlab.s(i)== 2; P_var = r2;
+            elseif matlab.s(i)== 3; P_var = r3;
+            elseif matlab.s(i)== 4; P_var = r23;
+            elseif matlab.s(i)== 5; P_var = r13;    
+            elseif matlab.s(i)== 6; P_var = r12;
+            end
+
+            Cell_Plot(P_var,L,H)
+            title(StressTitles{matlab.s(i)})
         end
-        
-        Cell_Plot(P_var,L,H)
-        title(StressTitles{matlab.s(i)})
     end
-        
-    for i = 1:matlab.ne
-        
-        if     matlab.e(i)== 1; P_var = e1;
-        elseif matlab.e(i)== 2; P_var = e2;
-        elseif matlab.e(i)== 3; P_var = e3;
-        elseif matlab.e(i)== 4; P_var = e23;
-        elseif matlab.e(i)== 5; P_var = e13;    
-        elseif matlab.e(i)== 6; P_var = e12;
+    
+    if isfield(matlab,'ne')    
+        for i = 1:matlab.ne
+
+            if     matlab.e(i)== 1; P_var = e1;
+            elseif matlab.e(i)== 2; P_var = e2;
+            elseif matlab.e(i)== 3; P_var = e3;
+            elseif matlab.e(i)== 4; P_var = e23;
+            elseif matlab.e(i)== 5; P_var = e13;    
+            elseif matlab.e(i)== 6; P_var = e12;
+            end
+
+            Cell_Plot(P_var,L,H)
+            title(StrainTitles{matlab.e(i)})
         end
-        
-        Cell_Plot(P_var,L,H)
-        title(StrainTitles{matlab.e(i)})
     end
     
     

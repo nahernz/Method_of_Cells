@@ -1,7 +1,7 @@
 function [mat,arch,load,out] = MOC_read(inputfile)
 
     fid = fopen(inputfile,'r');
-
+out = [];
     s = fgetl(fid);
     while ~feof(fid)
         if ~isempty(strfind(s,'%')) % comment line
