@@ -96,7 +96,7 @@ function arch = architecture(fid)
         
         hn = [0, 0.1229, 0.1229, 0.4916, 0.1229, 0.1229, 0]; 
         % fiber with unit area, scale by fiber area 
-        H  = (pi/4*df^2)*hn;
+        H  = sqrt(pi/4*df^2)*hn;
         L = H;
         
         SM = [2,2,2,2,2,2,2;
@@ -149,6 +149,71 @@ function arch = architecture(fid)
         arch.l = L;
         arch.sm = SM;
         
+    elseif arch.amod == 3 % hex packed
+        
+        vf = fscanf(fid,'VF=%f\n',1);
+        df = fscanf(fid,'DF=%e\n',1);
+        
+        dx = [0.277350098112615, 0.138675049056307, 0.138675049056307];
+        x0  = [0, dx(1), dx(1)+dx(2), sum(dx)];
+        xfiber = sqrt(pi/4*df^2)*x0;                  % x locations of center fiber
+        sf = sqrt((pi/2*df^2)/(vf*sqrt(3)));
+
+        xleft = sf*(sqrt(3)/2);
+        xfiber2 = xleft-fliplr(xfiber);
+
+        x = sort([xfiber,xfiber2]);
+
+        yfiber2 = sf*1/2-(xfiber);
+        y = sort([xfiber,yfiber2]);
+
+        for i = 1:size(x,2)-1
+            xc(i) = (x(i)+x(i+1))/2;
+        end
+        for i = 1:size(y,2)-1
+            yc(i) = (y(i)+y(i+1))/2;
+        end
+
+        sm = zeros(size(yc,2),size(xc,2));
+        for b = 1:size(xc,2)
+            for g = 1:size(yc,2)
+                % test if center fiber
+                if     xc(b) < xfiber(4) && yc(g) < xfiber(2) % section 1
+                    sm(g,b) = 1; % fiber
+                elseif xc(b) < xfiber(3) && yc(g) < xfiber(3) % section 2
+                    sm(g,b) = 1; % fiber
+                elseif xc(b) < xfiber(2) && yc(g) < xfiber(4) % section 3
+                    sm(g,b) = 1; % fiber
+
+                % test if quarter fiber
+                elseif xc(b) > xfiber2(1) && yc(g) > yfiber2(2) % section 1
+                    sm(g,b) = 1; % fiber
+                elseif xc(b) > xfiber2(2) && yc(g) > yfiber2(3) % section 2
+                    sm(g,b) = 1; % fiber
+                elseif xc(b) > xfiber2(3) && yc(g) > yfiber2(4) % section 3
+                    sm(g,b) = 1; % fiber
+                else % matrix
+                    sm(g,b) = 2; 
+                end
+            end
+        end
+
+        SM = [rot90(sm,2),flipud(sm);fliplr(sm),sm];
+
+        for i = 1:size(x,2)-1
+            l(i) = x(i+1)-x(i);
+        end
+        for i = 1:size(y,2)-1
+            h(i) = y(i+1)-y(i);
+        end
+        L = [fliplr(l),l];
+        H = [h,fliplr(h)];
+        
+        arch.sm = SM;
+        arch.l  = L;
+        arch.h  = H;
+        
+        
     elseif arch.amod == 4
         dim = fscanf(fid,'DIM=%i,%i,\n',2);
         
@@ -195,26 +260,31 @@ end
 
 function matlab = output(fid)
 
-    matlab.ns = fscanf(fid,'NSE=%i\n',1);  
-    matlab.s(1) = fscanf(fid,'SE=%i,',1);
-    for i = 2:matlab.ns
-        matlab.s(i) = fscanf(fid,'%i,',1);
+    matlab.ns = fscanf(fid,'NSE=%i\n',1);
+    if matlab.ns > 0
+        matlab.s(1) = fscanf(fid,'SE=%i,',1);
+        for i = 2:matlab.ns
+            matlab.s(i) = fscanf(fid,'%i,',1);
+        end
+        fgets(fid);
     end
-    fgets(fid);
     
-    matlab.ne = fscanf(fid,'NSA=%i\n',1);   
-    matlab.e(1) = fscanf(fid,'SA=%i,',1);
-    for i = 2:matlab.ne
-        matlab.e(i) = fscanf(fid,'%i,',1);
+    matlab.ne = fscanf(fid,'NSA=%i\n',1); 
+    if matlab.ne > 0
+        matlab.e(1) = fscanf(fid,'SA=%i,',1);
+        for i = 2:matlab.ne
+            matlab.e(i) = fscanf(fid,'%i,',1);
+        end
+        fgets(fid);
     end
-    fgets(fid);
-    
-    matlab.nE = fscanf(fid,'NSF=%i\n',1);   
-    matlab.E(1) = fscanf(fid,'SF=%i,',1);
-    for i = 2:matlab.nE
-        matlab.E(i) = fscanf(fid,'%i,',1);
+        
+    matlab.nE = fscanf(fid,'NSF=%i\n',1); 
+    if matlab.nE > 0
+        matlab.E(1) = fscanf(fid,'SF=%i,',1);
+        for i = 2:matlab.nE
+            matlab.E(i) = fscanf(fid,'%i,',1);
+        end
+        fgets(fid);
     end
-    fgets(fid);
-    
 end
 

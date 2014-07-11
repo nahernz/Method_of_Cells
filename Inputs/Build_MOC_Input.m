@@ -9,7 +9,7 @@ function Build_MOC_Input
 
 % create the filespace
 
-filename = 'FiberCentered_0.5_03_AS_ML.moci';
+filename = 'Hex_0.5_01_AS.moci';
 fid = fopen(filename,'w+');
 
 % create the input header
@@ -107,7 +107,7 @@ end
 
 fprintf(fid,'*CELL\n');
 
-amod = 2;
+amod = 3;
 %   1 = 4 cell square
 %   2 = fiber centered square
 %   3 = hex packed rectangle 
@@ -231,10 +231,12 @@ fprintf(fid,'%%\n');
 if true
     
     % Matlab plots of stresses and strains
-    s = [1 2 4 5]; % s11 s22 s23 s13
-    e = [1 2 4 5]; % e11 e22 e23 e13
+    %s = [1 2 4 5]; % s11 s22 s23 s13
+    s = 1;
+    %e = [1 2 4 5]; % e11 e22 e23 e13
+    e = [];
     % print stiffnesses to workspace
-    E = [1 2 4 5]; % E11 E22 G23 G13
+    E = []; % E11 E22 G23 G13
     
     fprintf(fid,'*MATLAB\n');
     

@@ -2,7 +2,7 @@ function [C,s,e] = MOC(input)
 
 close all
 
-input = 'Fourcell_0.5_01_AS_ML';
+input = 'Hex_0.5_01_AS';
 inputfile = ['Inputs/',input,'.moci'];
 
 [mat,arch,load,matlab] = MOC_read(inputfile);
@@ -12,7 +12,7 @@ inputfile = ['Inputs/',input,'.moci'];
 nmat = size(mat,1);
 Cn = cell(nmat,1);
 
-% Build the C matrix depending on the 
+% Build the C matrix depending on the material
 for i = 1:nmat
     cmod = mat{i}.cmod;
     if cmod == 1
@@ -50,17 +50,13 @@ end
 
 % Cell Architecture
 amod = arch.amod;
-
-if amod == 3
-    error('myApp:argChk', 'ADD FUNCTIONALITY FOR HEX PACKED RUC')
-    
-else 
+   
     L = arch.l;
     H = arch.h;
 
     
     SM = arch.sm;
-end    
+   
 
 Ng = size(L,2);
 l=zeros(1,Ng);
