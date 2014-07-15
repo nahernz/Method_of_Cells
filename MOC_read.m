@@ -94,7 +94,8 @@ function arch = architecture(fid)
         vf = fscanf(fid,'VF=%f\n',1);
         df = fscanf(fid,'DF=%e\n',1);
         
-        hn = [0, 0.1229, 0.1229, 0.4916, 0.1229, 0.1229, 0]; 
+        hn = [0, 0.138675049056307, 0.138675049056307, 0.554700196225230,...
+                0.138675049056307, 0.138675049056307, 0]; 
         % fiber with unit area, scale by fiber area 
         H  = sqrt(pi/4*df^2)*hn;
         L = H;

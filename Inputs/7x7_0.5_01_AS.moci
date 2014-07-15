@@ -1,5 +1,5 @@
-% MOC Input: FiberCentered_0.5_03_AS_ML.moci
-% Created: 07-Jul-2014 17:26:49
+% MOC Input: 7x7_0.5_01_AS.moci
+% Created: 11-Jul-2014 13:16:40
 %
 *CONSTITUENTS
 NMATS=2
@@ -26,11 +26,9 @@ NL=1
 L=0.00100,
 %
 *MATLAB
-NSE=4
-SE=1,2,4,5,
-NSA=4
-SA=1,2,4,5,
-NSF=4
-SF=1,2,4,5,
+NSE=1
+SE=1,
+NSA=0
+NSF=0
 %
 *END

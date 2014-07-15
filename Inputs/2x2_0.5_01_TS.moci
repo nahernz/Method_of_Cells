@@ -1,5 +1,5 @@
-% MOC Input: FiberCentered_0.5_05.moci
-% Created: 18-Jun-2014 15:12:30
+% MOC Input: 2x2_0.5_01_TS.moci
+% Created: 15-Jul-2014 10:07:31
 %
 *CONSTITUENTS
 NMATS=2
@@ -16,13 +16,19 @@ E=3.310e+03
 NU=0.318
 %
 *CELL
-AMOD=2
+AMOD=1
 VF=0.500
 DF=5.000e-03
 %
 *LOADING
-LMOD=1
+LMOD=2
 NL=1
 L=0.00100,
+%
+*MATLAB
+NSE=1
+SE=1,
+NSA=0
+NSF=0
 %
 *END

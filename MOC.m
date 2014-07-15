@@ -1,8 +1,12 @@
-function [C,s,e] = MOC(input)
+function [C_star,s_avg,e_avg] = MOC(input)
 
 close all
 
-input = 'Hex_0.5_01_AS';
+%input = '2x2_0.5_01_AS';
+%input = '7x7_0.5_01_AS';
+%input = 'Hex_0.5_01_AS';
+
+input = '2x2_0.5_01_TS';
 inputfile = ['Inputs/',input,'.moci'];
 
 [mat,arch,load,matlab] = MOC_read(inputfile);
@@ -49,7 +53,7 @@ end
     
 
 % Cell Architecture
-amod = arch.amod;
+%amod = arch.amod;
    
     L = arch.l;
     H = arch.h;
@@ -303,8 +307,8 @@ for nl = 1:nloads
             r12(b,g) = rsub((g-1)*6+(b-1)*6*Ng+6,1);
         end
     end
-    s = [r1;r2;r3;r23;r13;r12];
-    e = [e1;e2;e3;e23;e13;e12];
+%     s = [r1;r2;r3;r23;r13;r12];
+%     e = [e1;e2;e3;e23;e13;e12];
     
     s_avg  = zeros(6,1);
     e_avg  = zeros(6,1);
@@ -321,23 +325,20 @@ for nl = 1:nloads
             V     = V + Vbg;
         end
     end
-    B
+    
     i = 1;
     for b=1:Nb
         for g=1:Ng
             matn = SM(b,g);
-            B((i-1)*6+1:(i)*6,1:6)
+
             C_star = C_star + 1/(sum(H)*sum(L))*H(b)*L(g)*Cn{matn}*B((i-1)*6+1:(i)*6,1:6);
             i = i + 1;
             
         end
     end
     
-    C_star
-    
-    C_star*eglobal 
-    s_avg = s_avg/V
-    e_avg = e_avg/V
+    s_avg = s_avg/V;
+    e_avg = e_avg/V;
     
     
     % plot and output matlab data
@@ -350,9 +351,9 @@ for nl = 1:nloads
         'Transverse Strain (\epsilon_3_3)', 'Axial Shear Strain (\epsilon_2_3)',...
         'Transverse Shear Strain (\epsilon_1_3)','Transverse Shear Strain (\epsilon_1_2)'};
     
-    StiffTitles = {'Axial Stiffness (E_1_1)','Transverse Stiffness (E_2_2)',...
-        'Transverse Stiffness (E_3_3)','Axial Shear Stiffness (G_2_3)',...
-        'Transverse Shear Stiffness (G_1_3)','Transverse Shear Stiffness (G_1_2)'};
+%     StiffTitles = {'Axial Stiffness (E_1_1)','Transverse Stiffness (E_2_2)',...
+%         'Transverse Stiffness (E_3_3)','Axial Shear Stiffness (G_2_3)',...
+%         'Transverse Shear Stiffness (G_1_3)','Transverse Shear Stiffness (G_1_2)'};
 
     if isfield(matlab,'ns')
         for i = 1:matlab.ns
@@ -395,7 +396,8 @@ for nl = 1:nloads
     E22 = 4*G23*K23/(K23 + (1 + 4*K23*v12^2/E11)*G23)
     v23 = E22/(2*G23) - 1
 
-    
+   %E112 = s_avg(1)/e_avg(1);
+   E222 = s_avg(2)/e_avg(2)
     % output to file
     
     

@@ -9,7 +9,7 @@ function Build_MOC_Input
 
 % create the filespace
 
-filename = 'Hex_0.5_01_AS.moci';
+filename = '2x2_0.5_01_TS.moci';
 fid = fopen(filename,'w+');
 
 % create the input header
@@ -107,7 +107,7 @@ end
 
 fprintf(fid,'*CELL\n');
 
-amod = 3;
+amod = 1;
 %   1 = 4 cell square
 %   2 = fiber centered square
 %   3 = hex packed rectangle 
@@ -182,7 +182,7 @@ end
 
 fprintf(fid,'*LOADING\n');
 
-lmod = 1;
+lmod = 2;
 %   1 = axial strain
 %   2 = tangential strain
 %   3 = shear strain
