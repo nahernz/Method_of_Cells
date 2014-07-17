@@ -98,3 +98,10 @@ output.E22 = (4*output.G23*output.K23)/...
     (output.K23 + (1 + (4*output.K23*output.v12^2/output.E11))*output.G23);
 
 output.v23 = output.E22/(2*output.G23) - 1;
+
+Cout = [output.E11+4*output.v12^2*output.K23, 2*output.v12*output.K23, 2*output.v12*output.K23, 0, 0, 0;
+        2*output.v12*output.K23, output.K23 + output.G23, output.K23 - output.G23, 0, 0, 0;
+        2*output.v12*output.K23, output.K23 - output.G23, output.K23 + output.G23, 0, 0, 0;
+        0, 0, 0, output.G23, 0, 0;
+        0, 0, 0, 0, output.G23, 0;
+        0, 0, 0, 0, 0, output.G23]

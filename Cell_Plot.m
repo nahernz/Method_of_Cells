@@ -22,9 +22,10 @@ V = zeros(size(value)+1);
 V(1:end-1,1:end-1) = value;
 
 figure
-pcolor(X,Y,V)
+g = pcolor(X,Y,V);
 h = colorbar;
 xlabel(h,'MPa')
+set(g,'EdgeColor','none')
 axis equal
 axis tight
 end

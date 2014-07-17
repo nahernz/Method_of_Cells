@@ -5,8 +5,10 @@ close all
 %input = '2x2_0.5_01_AS';
 %input = '7x7_0.5_01_AS';
 %input = 'Hex_0.5_01_AS';
+input = 'HexInter_0.5_01_AS';
 
-input = '2x2_0.5_01_TS';
+%input = '2x2_0.5_01_TS';
+
 inputfile = ['Inputs/',input,'.moci'];
 
 [mat,arch,load,matlab] = MOC_read(inputfile);

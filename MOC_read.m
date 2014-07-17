@@ -69,7 +69,26 @@ function mat = constituents(fid)
         mat{matnum}.E = fscanf(fid,'E=%e\n',1);
         mat{matnum}.V = fscanf(fid,'NU=%f\n',1);
     end
-   
+    s = fgetl(fid);
+    
+    clear matnum
+    matnum = fscanf(fid,'MAT=%i,CMOD=%i\n',2);
+    if ~isempty(matnum)
+        cmod = matnum(2); matnum(2) = [];
+
+        mat{matnum}.cmod = cmod;
+        if cmod == 1
+            mat{matnum}.E11 = fscanf(fid,'EA=%e\n',1);
+            mat{matnum}.E22 = fscanf(fid,'ET=%e\n',1);
+            mat{matnum}.V11 = fscanf(fid,'NUA=%f\n',1);
+            mat{matnum}.V22 = fscanf(fid,'NUT=%f\n',1);
+            mat{matnum}.G23 = fscanf(fid,'GA=%e\n',1);
+            mat{matnum}.G12 = fscanf(fid,'GT=%e\n',1);
+        elseif cmod == 2
+            mat{matnum}.E = fscanf(fid,'E=%e\n',1);
+            mat{matnum}.V = fscanf(fid,'NU=%f\n',1);
+        end
+    end
 end
 
 function arch = architecture(fid)
@@ -216,6 +235,100 @@ function arch = architecture(fid)
         
         
     elseif arch.amod == 4
+        % Hex packed with interphase
+        vf = fscanf(fid,'VF=%f\n',1);
+        df = fscanf(fid,'DF=%e\n',1);
+        it = fscanf(fid,'IT=%f\n',1);
+        
+        if vf > .9
+            error('FIBER VOLUME FRACTION EXCEEDS MAXIMUM')
+            return
+        end
+
+        %x = [0.1387, 0.1387, 0.5547, 0.1387, 0.1387];
+        dx = [0.277350098112615, 0.138675049056307, 0.138675049056307];
+        x0  = [0, dx(1), dx(1)+dx(2), sum(dx)];
+        xfiber = sqrt(pi/4*df^2)*x0;                  % x locations of center fiber
+        xinter = xfiber(2:end) + it*df/2;
+        sf = sqrt((pi/2*df^2)/(vf*sqrt(3)));
+
+        xleft = sf*(sqrt(3)/2);
+        xfiber2 = xleft-fliplr(xfiber);
+        xinter2 = xfiber2(1:end-1)-it*df/2;
+
+        x = sort([xfiber,xinter,xfiber2,xinter2]);
+
+        yfiber2 = sf*1/2-(xfiber);
+        yinter2 = yfiber2(2:end)-it*df/2;
+        y = sort([xfiber,xinter,yfiber2,yinter2]);
+
+        for i = 1:size(x,2)-1
+            xc(i) = (x(i)+x(i+1))/2;
+        end
+        for i = 1:size(y,2)-1
+            yc(i) = (y(i)+y(i+1))/2;
+        end
+
+        sm = zeros(size(yc,2),size(xc,2));
+        for b = 1:size(xc,2)
+            for g = 1:size(yc,2)
+                % test if center fiber or interphase
+                if     xc(b) < xinter(3) && yc(g) < xinter(1) % section 1
+                    sm(g,b) = 3; % interphase
+                elseif xc(b) < xinter(2) && yc(g) < xinter(2) % section 2
+                    sm(g,b) = 3; % interphase
+                elseif xc(b) < xinter(1) && yc(g) < xinter(3) % section 3
+                    sm(g,b) = 3; % interphase
+                end
+
+                % test if quarter fiber interphase
+                if     xc(b) > xinter2(1) && yc(g) > yinter2(1) % section 1
+                    sm(g,b) = 3; % interphase
+                elseif xc(b) > xinter2(2) && yc(g) > yinter2(2) % section 2
+                    sm(g,b) = 3; % interphase
+                elseif xc(b) > xinter2(3) && yc(g) > yinter2(3) % section 3
+                    sm(g,b) = 3; % interphase
+                end
+
+                if xc(b) < xfiber(4) && yc(g) < xfiber(2) % section 1
+                    sm(g,b) = 1; % fiber
+                elseif xc(b) < xfiber(3) && yc(g) < xfiber(3) % section 2
+                    sm(g,b) = 1; % fiber
+                elseif xc(b) < xfiber(2) && yc(g) < xfiber(4) % section 3
+                    sm(g,b) = 1; % fiber
+                end
+
+                % test if quarter fiber
+                if     xc(b) > xfiber2(1) && yc(g) > yfiber2(2) % section 1
+                    sm(g,b) = 1; % fiber
+                elseif xc(b) > xfiber2(2) && yc(g) > yfiber2(3) % section 2
+                    sm(g,b) = 1; % fiber
+                elseif xc(b) > xfiber2(3) && yc(g) > yfiber2(4) % section 3
+                    sm(g,b) = 1; % fiber
+                end
+
+                if sm(g,b) == 0; % matrix
+                    sm(g,b) = 2; 
+                end
+            end
+        end
+
+        SM = [rot90(sm,2),flipud(sm);fliplr(sm),sm];
+
+        for i = 1:size(x,2)-1
+            l(i) = x(i+1)-x(i);
+        end
+        for i = 1:size(y,2)-1
+            h(i) = y(i+1)-y(i);
+        end
+        L = [fliplr(l),l];
+        H = [h,fliplr(h)];
+        
+        arch.sm = SM;
+        arch.l  = L;
+        arch.h  = H;
+        
+    elseif arch.amod == 5
         dim = fscanf(fid,'DIM=%i,%i,\n',2);
         
         arch.h(1) = fscanf(fid,'H=%e,',1);
