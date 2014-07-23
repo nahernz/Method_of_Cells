@@ -1,5 +1,5 @@
-% MOC Input: HexInter_0.5_01_AS.moci
-% Created: 17-Jul-2014 11:49:40
+% MOC Input: 2x2_0.5_01_TS.moci
+% Created: 15-Jul-2014 10:07:31
 %
 *CONSTITUENTS
 NMATS=2
@@ -15,18 +15,13 @@ MAT=2,CMOD=2
 E=3.310e+03
 NU=0.318
 %
-MAT=3,CMOD=2
-E=1.000e+05
-NU=0.318
-%
 *CELL
-AMOD=5
+AMOD=1
 VF=0.500
 DF=5.000e-03
-IT=0.020
 %
 *LOADING
-LMOD=1
+LMOD=2
 NL=1
 L=0.00100,
 %

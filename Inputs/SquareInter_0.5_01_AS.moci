@@ -1,5 +1,5 @@
-% MOC Input: HexInter_0.5_01_AS.moci
-% Created: 17-Jul-2014 11:49:40
+% MOC Input: SquareInter_0.5_01_AS.moci
+% Created: 22-Jul-2014 13:14:13
 %
 *CONSTITUENTS
 NMATS=2
@@ -20,7 +20,7 @@ E=1.000e+05
 NU=0.318
 %
 *CELL
-AMOD=5
+AMOD=4
 VF=0.500
 DF=5.000e-03
 IT=0.020

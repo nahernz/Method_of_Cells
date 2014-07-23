@@ -233,8 +233,74 @@ function arch = architecture(fid)
         arch.l  = L;
         arch.h  = H;
         
-        
     elseif arch.amod == 4
+        % square packed with interphase
+        vf = fscanf(fid,'VF=%f\n',1);
+        df = fscanf(fid,'DF=%e\n',1);
+        it = fscanf(fid,'IT=%f\n',1);
+        
+        if vf > .75
+            error('FIBER VOLUME FRACTION EXCEEDS MAXIMUM')
+            return
+        end
+
+        %x = [0.1387, 0.1387, 0.5547, 0.1387, 0.1387];
+        dx = [0.277350098112615, 0.138675049056307, 0.138675049056307];
+        x0  = [0, dx(1), dx(1)+dx(2), sum(dx)];
+        xfiber = sqrt(pi/4*df^2)*x0;                  % x locations of center fiber
+        xinter = xfiber(2:end) + it*df/2;
+
+        xleft = sqrt((pi*df^2)/(16*vf));
+
+        x = sort([xfiber,xinter,xleft]);
+
+
+        for i = 1:size(x,2)-1
+            xc(i) = (x(i)+x(i+1))/2;
+        end
+
+        sm = zeros(size(xc,2),size(xc,2));
+        for b = 1:size(xc,2)
+            for g = 1:size(xc,2)
+                % test if center fiber or interphase
+                if     xc(b) < xinter(3) && xc(g) < xinter(1) % section 1
+                    sm(g,b) = 3; % interphase
+                elseif xc(b) < xinter(2) && xc(g) < xinter(2) % section 2
+                    sm(g,b) = 3; % interphase
+                elseif xc(b) < xinter(1) && xc(g) < xinter(3) % section 3
+                    sm(g,b) = 3; % interphase
+                end
+
+                % test if center fiber
+                if xc(b) < xfiber(4) && xc(g) < xfiber(2) % section 1
+                    sm(g,b) = 1; % fiber
+                elseif xc(b) < xfiber(3) && xc(g) < xfiber(3) % section 2
+                    sm(g,b) = 1; % fiber
+                elseif xc(b) < xfiber(2) && xc(g) < xfiber(4) % section 3
+                    sm(g,b) = 1; % fiber
+                end
+
+
+                if sm(g,b) == 0; % matrix
+                    sm(g,b) = 2; 
+                end
+            end
+        end
+
+        SM = [rot90(sm,2),flipud(sm(1:end,2:end));fliplr(sm(2:end,1:end)),sm(2:end,2:end)];
+
+        for i = 1:size(x,2)-1
+            l(i) = x(i+1)-x(i);
+        end
+
+        L = [fliplr(l(2:end)),2*l(1),l(2:end)];
+        H = L;
+        
+        arch.h = H;
+        arch.l = L;
+        arch.sm = SM;
+        
+    elseif arch.amod == 5
         % Hex packed with interphase
         vf = fscanf(fid,'VF=%f\n',1);
         df = fscanf(fid,'DF=%e\n',1);
@@ -328,7 +394,7 @@ function arch = architecture(fid)
         arch.l  = L;
         arch.h  = H;
         
-    elseif arch.amod == 5
+    elseif arch.amod == 6
         dim = fscanf(fid,'DIM=%i,%i,\n',2);
         
         arch.h(1) = fscanf(fid,'H=%e,',1);
