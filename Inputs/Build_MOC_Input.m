@@ -9,7 +9,7 @@ function Build_MOC_Input
 
 % create the filespace
 
-filename = 'SquareInter_0.5_01_AS.moci';
+filename = 'SquareInter_0.5_01_AS_(Test).moci';
 fid = fopen(filename,'w+');
 
 % create the input header
@@ -128,7 +128,7 @@ if true
         fprintf(fid,'GT=%8.3e\n%%\n',G12);
 
     elseif cmod == 2
-        E = 100e3;   % MPa
+        E = 3.31e3;   % MPa
         v = 0.318;     
 
 

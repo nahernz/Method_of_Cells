@@ -7,12 +7,13 @@ close all
 %input = 'Hex_0.5_01_AS';
 input = 'HexInter_0.5_01_AS';
 %input = 'SquareInter_0.5_01_AS';
+%input = 'SquareInter_0.5_01_AS_(Test)';
 
 %input = '2x2_0.5_01_TS';
 
 inputfile = ['Inputs/',input,'.moci'];
 
-[mat,arch,load,matlab] = MOC_read(inputfile)
+[mat,arch,load,matlab] = MOC_read(inputfile);
 
 
 % Materials
@@ -400,7 +401,7 @@ for nl = 1:nloads
     v23 = E22/(2*G23) - 1
 
    %E112 = s_avg(1)/e_avg(1);
-   E222 = s_avg(2)/e_avg(2)
+   %E222 = s_avg(2)/e_avg(2)
     % output to file
     
     
