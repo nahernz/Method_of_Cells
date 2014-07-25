@@ -71,9 +71,9 @@ H = L;
         for x = 1:size(L,2);
             y0 = 0;
             for y = 1:size(H,2);
-                if     SM(y,x) == 1;  color = 'b';
-                elseif SM(y,x) == 2; color = 'y';
-                elseif SM(y,x) == 3; color = 'r';
+                if     SM(y,x) == 1; color = [.75 0 0];
+                elseif SM(y,x) == 2; color = [.2 .2 1];
+                elseif SM(y,x) == 3; color = [1 1 1];
                 end
                 X = [x0, x0, x0+L(x), x0+L(x)];
                 Y = [y0, y0+H(y), y0+H(y), y0];
