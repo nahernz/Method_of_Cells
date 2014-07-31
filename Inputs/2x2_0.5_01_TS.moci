@@ -16,7 +16,7 @@ E=3.310e+03
 NU=0.318
 %
 *CELL
-AMOD=1
+AMOD=3
 VF=0.500
 DF=5.000e-03
 %
@@ -26,8 +26,8 @@ NL=1
 L=0.00100,
 %
 *MATLAB
-NSE=1
-SE=2,
+NSE=2
+SE=2,3,
 NSA=0
 NSF=0
 %
