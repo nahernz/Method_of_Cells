@@ -9,7 +9,7 @@ function Build_MOC_Input
 
 % create the filespace
 
-filename = 'HexInter_0.5_01_AS.moci';
+filename = 'HexInter_0.5_02_AS.moci';
 fid = fopen(filename,'w+');
 
 % create the input header
@@ -33,11 +33,11 @@ cmod = 1;
 %   add other models later
 
 if cmod == 1
-    E11 = 251e3;   % MPa
-    E22 = 40.4e3;    % MPa
-    v12 = .321;     
-    G12 = 30.7e3;    % MPa
-    v23 = 0.256;
+    E11 = 250e3;   % MPa
+    E22 = 40e3;    % MPa
+    v12 = 0.32;     
+    G12 = 30e3;    % MPa
+    v23 = 0.25;
     G23 = 1/2*(E22/(v23+1));  % MPa
     
     
@@ -51,8 +51,8 @@ if cmod == 1
     fprintf(fid,'GT=%8.3e\n%%\n',G12);
 
 elseif cmod == 2
-    E = 3.31e3;   % MPa
-    v = 0.318;    
+    E = 3.25e3;   % MPa
+    v = 0.32;    
 
     
     % write input
@@ -71,11 +71,11 @@ cmod = 2;
 %   add other models later
 
 if cmod == 1
-    E11 = 251e3;   % MPa
-    E22 = 40.4e3;    % MPa
-    v12 = .321;     
-    G12 = 30.7e3;    % MPa
-    v23 = 0.256;
+    E11 = 250e3;   % MPa
+    E22 = 40e3;    % MPa
+    v12 = 0.32;     
+    G12 = 30e3;    % MPa
+    v23 = 0.25;
     G23 = 1/2*(E22/(v23+1));  % MPa
     
     
@@ -89,8 +89,8 @@ if cmod == 1
     fprintf(fid,'GT=%8.3e\n%%\n',G12);
 
 elseif cmod == 2
-    E = 3.31e3;   % MPa
-    v = 0.318;     
+    E = 3.25e3;   % MPa
+    v = 0.32;    
 
     
     % write input
@@ -101,44 +101,45 @@ else
     disp('add more material models')
 end
 
-% MATERIAL 3 (interphase)
-mat = 3;
-cmod = 2;
-%   1 = general elastic
-%   2 = isotropic elastic
-%   add other models later
+    % MATERIAL 3 (interphase)
+if true
+    mat = 3;
+    cmod = 2;
+    %   1 = general elastic
+    %   2 = isotropic elastic
+    %   add other models later
 
-if cmod == 1
-    E11 = 251e3;   % MPa
-    E22 = 40.4e3;    % MPa
-    v12 = .321;     
-    G12 = 30.7e3;    % MPa
-    v23 = 0.256;
-    G23 = 1/2*(E22/(v23+1));  % MPa
-    
-    
-    % write input
-    fprintf(fid,'MAT=%i,CMOD=%i\n',mat,cmod);
-    fprintf(fid,'EA=%8.3e\n',E11);
-    fprintf(fid,'ET=%8.3e\n',E22);
-    fprintf(fid,'NUA=%0.3f\n',v23);
-    fprintf(fid,'NUT=%0.3f\n',v12);
-    fprintf(fid,'GA=%8.3e\n',G23);
-    fprintf(fid,'GT=%8.3e\n%%\n',G12);
+    if cmod == 1
+        E11 = 250e3;   % MPa
+        E22 = 40e3;    % MPa
+        v12 = 0.32;     
+        G12 = 30e3;    % MPa
+        v23 = 0.25;
+        G23 = 1/2*(E22/(v23+1));  % MPa
 
-elseif cmod == 2
-    E = 100e3;   % MPa
-    v = 0.318;     
 
-    
-    % write input
-    fprintf(fid,'MAT=%i,CMOD=%i\n',mat,cmod);
-    fprintf(fid,'E=%8.3e\n',E);
-    fprintf(fid,'NU=%0.3f\n%%\n',v);
-else
-    disp('add more material models')
+        % write input
+        fprintf(fid,'MAT=%i,CMOD=%i\n',mat,cmod);
+        fprintf(fid,'EA=%8.3e\n',E11);
+        fprintf(fid,'ET=%8.3e\n',E22);
+        fprintf(fid,'NUA=%0.3f\n',v23);
+        fprintf(fid,'NUT=%0.3f\n',v12);
+        fprintf(fid,'GA=%8.3e\n',G23);
+        fprintf(fid,'GT=%8.3e\n%%\n',G12);
+
+    elseif cmod == 2
+        E = 100e3;   % MPa
+        v = 0.32;    
+
+
+        % write input
+        fprintf(fid,'MAT=%i,CMOD=%i\n',mat,cmod);
+        fprintf(fid,'E=%8.3e\n',E);
+        fprintf(fid,'NU=%0.3f\n%%\n',v);
+    else
+        disp('add more material models')
+    end
 end
-
 
 %--------------------------------------------------------------------------
 %                            CELL ARCHITECTURE 
@@ -146,12 +147,13 @@ end
 
 fprintf(fid,'*CELL\n');
 
-amod = 4;
+amod = 5;
 %   1 = 4 cell square
 %   2 = fiber centered square
 %   3 = hex packed rectangle 
-%   4 = hex packed with interphase
-%   5 = user defined
+%   4 = fiber centered square with interphase
+%   5 = hex packed with interphase
+%   6 = user defined
 %   add other models
 
 if amod == 1
@@ -189,6 +191,16 @@ elseif amod == 4
     fprintf(fid,'IT=%0.3f\n%%\n',It);
     
 elseif amod == 5
+    Vf = 0.5;  % fiber volume fraction
+    Df = 5e-3;   % fiber diameter (m)
+    It = 0.02;  % normalized interphase thickness
+    
+    fprintf(fid,'AMOD=%i\n',amod);
+    fprintf(fid,'VF=%0.3f\n',Vf);
+    fprintf(fid,'DF=%8.3e\n',Df);
+    fprintf(fid,'IT=%0.3f\n%%\n',It);
+    
+elseif amod == 6
     DIM = [2,2]; %[H,L]
     
     H = [1,1];  % fiber volume fraction
@@ -282,7 +294,7 @@ if true
     
     % Matlab plots of stresses and strains
     %s = [1 2 4 5]; % s11 s22 s23 s13
-    s = 1;
+    s = [1];
     %e = [1 2 4 5]; % e11 e22 e23 e13
     e = [];
     % print stiffnesses to workspace
