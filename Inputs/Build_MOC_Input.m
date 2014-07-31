@@ -9,7 +9,7 @@ function Build_MOC_Input
 
 % create the filespace
 
-filename = 'SquareInter_0.5_01_AS_(Test).moci';
+filename = 'HexInter_0.5_02_AS.moci';
 fid = fopen(filename,'w+');
 
 % create the input header
@@ -33,11 +33,11 @@ cmod = 1;
 %   add other models later
 
 if cmod == 1
-    E11 = 251e3;   % MPa
-    E22 = 40.4e3;    % MPa
-    v12 = .321;     
-    G12 = 30.7e3;    % MPa
-    v23 = 0.256;
+    E11 = 250e3;   % MPa
+    E22 = 40e3;    % MPa
+    v12 = 0.32;     
+    G12 = 30e3;    % MPa
+    v23 = 0.25;
     G23 = 1/2*(E22/(v23+1));  % MPa
     
     
@@ -51,8 +51,8 @@ if cmod == 1
     fprintf(fid,'GT=%8.3e\n%%\n',G12);
 
 elseif cmod == 2
-    E = 3.31e3;   % MPa
-    v = 0.318;    
+    E = 3.25e3;   % MPa
+    v = 0.32;    
 
     
     % write input
@@ -71,11 +71,11 @@ cmod = 2;
 %   add other models later
 
 if cmod == 1
-    E11 = 251e3;   % MPa
-    E22 = 40.4e3;    % MPa
-    v12 = .321;     
-    G12 = 30.7e3;    % MPa
-    v23 = 0.256;
+    E11 = 250e3;   % MPa
+    E22 = 40e3;    % MPa
+    v12 = 0.32;     
+    G12 = 30e3;    % MPa
+    v23 = 0.25;
     G23 = 1/2*(E22/(v23+1));  % MPa
     
     
@@ -89,8 +89,8 @@ if cmod == 1
     fprintf(fid,'GT=%8.3e\n%%\n',G12);
 
 elseif cmod == 2
-    E = 3.31e3;   % MPa
-    v = 0.318;     
+    E = 3.25e3;   % MPa
+    v = 0.32;    
 
     
     % write input
@@ -110,11 +110,11 @@ if true
     %   add other models later
 
     if cmod == 1
-        E11 = 251e3;   % MPa
-        E22 = 40.4e3;    % MPa
-        v12 = .321;     
-        G12 = 30.7e3;    % MPa
-        v23 = 0.256;
+        E11 = 250e3;   % MPa
+        E22 = 40e3;    % MPa
+        v12 = 0.32;     
+        G12 = 30e3;    % MPa
+        v23 = 0.25;
         G23 = 1/2*(E22/(v23+1));  % MPa
 
 
@@ -128,8 +128,8 @@ if true
         fprintf(fid,'GT=%8.3e\n%%\n',G12);
 
     elseif cmod == 2
-        E = 3.31e3;   % MPa
-        v = 0.318;     
+        E = 100e3;   % MPa
+        v = 0.32;    
 
 
         % write input
@@ -147,7 +147,7 @@ end
 
 fprintf(fid,'*CELL\n');
 
-amod = 4;
+amod = 5;
 %   1 = 4 cell square
 %   2 = fiber centered square
 %   3 = hex packed rectangle 
@@ -294,7 +294,7 @@ if true
     
     % Matlab plots of stresses and strains
     %s = [1 2 4 5]; % s11 s22 s23 s13
-    s = 1;
+    s = [1];
     %e = [1 2 4 5]; % e11 e22 e23 e13
     e = [];
     % print stiffnesses to workspace

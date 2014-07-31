@@ -5,7 +5,8 @@ close all
 %input = '2x2_0.5_01_AS';
 %input = '7x7_0.5_01_AS';
 %input = 'Hex_0.5_01_AS';
-input = 'HexInter_0.5_01_AS';
+%input = 'HexInter_0.5_01_AS';
+%input = 'HexInter_0.5_02_AS';
 %input = 'SquareInter_0.5_01_AS';
 %input = 'SquareInter_0.5_01_AS_(Test)';
 
@@ -330,6 +331,8 @@ for nl = 1:nloads
         end
     end
     
+    r1
+    
     i = 1;
     for b=1:Nb
         for g=1:Ng
@@ -392,13 +395,13 @@ for nl = 1:nloads
     end
     
     % Values needed to compare to CCM model:
-    E11 = C_star(1,1) - 2*C_star(1,2)^2/(C_star(2,2) + C_star(2,3))
-    v12 = C_star(1,2)/(C_star(2,2) + C_star(2,3))
-    G12 = C_star(6,6)
-    K23 = 1/2*(C_star(2,2) + C_star(2,3))
-    G23 = 1/2*(C_star(2,2) - C_star(2,3))
-    E22 = 4*G23*K23/(K23 + (1 + 4*K23*v12^2/E11)*G23)
-    v23 = E22/(2*G23) - 1
+%     E11 = C_star(1,1) - 2*C_star(1,2)^2/(C_star(2,2) + C_star(2,3))
+%     v12 = C_star(1,2)/(C_star(2,2) + C_star(2,3))
+%     G12 = C_star(6,6)
+%     K23 = 1/2*(C_star(2,2) + C_star(2,3))
+%     G23 = 1/2*(C_star(2,2) - C_star(2,3))
+%     E22 = 4*G23*K23/(K23 + (1 + 4*K23*v12^2/E11)*G23)
+%     v23 = E22/(2*G23) - 1
 
    %E112 = s_avg(1)/e_avg(1);
    %E222 = s_avg(2)/e_avg(2)
