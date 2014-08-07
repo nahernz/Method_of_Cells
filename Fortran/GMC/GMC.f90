@@ -30,16 +30,23 @@ PROGRAM GMC
     REAL :: delf
     REAL, DIMENSION(6, 6) :: Cf, Cm
     REAL :: c1, c2
+    ! Geometry Data
+    REAL, DIMENSION(7) :: H, L
+    REAL, DIMENSION(7,7) :: SM
     
-    delf = E22f*v12f**2+E11f*(v23f-1)
-    c1 = Em*vm/((1+vm)*(1-2*vm))
-    c2 = Em/(2*(1+vm))
+!-----------------------------------------------------------------------------
+!                           CODE STARTS
+!-----------------------------------------------------------------------------
     
     ! Body of GMC
     WRITE (*,'(A)') 'Generalized Method of Cells'
     WRITE (*,'(A)') 'written by Michael Kaplan and Rehan Nawaz'
     
     ! Build the stiffness matricees
+    
+    delf = E22f*v12f**2+E11f*(v23f-1)
+    c1 = Em*vm/((1+vm)*(1-2*vm))
+    c2 = Em/(2*(1+vm))
     
     WRITE (*,*)
     Cm(1:6,1) = (/ c1+2.0*c2, c1, c1, 0.0, 0.0, 0.0 /)
@@ -56,9 +63,21 @@ PROGRAM GMC
     Cf(1:6,4) = (/ 0.0, 0.0, 0.0, 2.0*G23f, 0.0, 0.0 /)
     Cf(1:6,5) = (/ 0.0, 0.0, 0.0, 0, 2.0*G12f, 0.0 /)
     Cf(1:6,6) = (/ 0.0, 0.0, 0.0, 0.0, 0.0, 2.0*G12f /)
-
     
-    WRITE (*,*) Cf
+    ! Geometry Variables
+    ! Square Pack
+    
+    L = (/ 6.75334e-4, 6.14488e-4, 6.14488e-4, 2.45795e-3,&
+           6.14488e-4, 6.14488e-4, 6.75334e-4 /)
+    H = L
+    SM(1:7,1) = (/ 2,2,2,2,2,2,2 /)
+    SM(1:7,2) = (/ 2,2,2,1,2,2,2 /)
+    SM(1:7,3) = (/ 2,2,1,1,1,2,2 /)
+    SM(1:7,4) = (/ 2,1,1,1,1,1,2 /)
+    SM(1:7,5) = (/ 2,2,1,1,1,2,2 /)
+    SM(1:7,6) = (/ 2,2,2,1,2,2,2 /)
+    SM(1:7,7) = (/ 2,2,2,2,2,2,2 /)
+
     PAUSE
 END PROGRAM GMC
 
