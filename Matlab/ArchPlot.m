@@ -3,8 +3,8 @@ function ArchPlot(input)
 close all
 
 %input = '2x2_0.5_01_AS';
-%input = '7x7_0.5_01_AS';
-input = 'Hex_0.5_01_AS';
+input = '7x7_0.5_01_AS';
+%input = 'Hex_0.5_01_AS';
 %input = 'HexInter_0.5_01_AS';
 %input = 'HexInter_0.5_02_AS';
 %input = 'SquareInter_0.5_01_AS';
@@ -16,9 +16,9 @@ inputfile = ['Inputs/',input,'.moci'];
 
 [~,arch,~,~] = MOC_read(inputfile);
 
-L  = arch.l;
-H  = fliplr(arch.h);
-SM = flipud(arch.sm);
+L  = arch.l
+H  = fliplr(arch.h)
+SM = flipud(arch.sm)
 
 x0 = 0;
 figure(1)
