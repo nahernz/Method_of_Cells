@@ -3,14 +3,14 @@ function [C_star,s_avg,e_avg] = MOC(input)
 close all
 
 %input = '2x2_0.5_01_AS';
-%input = '7x7_0.5_01_AS';
+input = '7x7_0.5_01_AS';
 %input = 'Hex_0.5_01_AS';
 %input = 'HexInter_0.5_01_AS';
 %input = 'HexInter_0.5_02_AS';
 %input = 'SquareInter_0.5_01_AS';
 %input = 'SquareInter_0.5_01_AS_(Test)';
 
-input = '2x2_0.5_01_TS';
+%input = '2x2_0.5_01_TS';
 
 inputfile = ['Inputs/',input,'.moci'];
 
@@ -406,7 +406,7 @@ for nl = 1:nloads
    %E112 = s_avg(1)/e_avg(1);
    %E222 = s_avg(2)/e_avg(2)
     % output to file
-    
+    C_star
     
 end % loading
 end
