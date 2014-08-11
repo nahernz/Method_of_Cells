@@ -301,8 +301,8 @@ subroutine inverse(a,c,n)
 !===========================================================
 implicit none 
 integer :: n
-double precision :: a(:,:)
-double precision :: c(:,:)
+double precision :: a(n,n)
+double precision :: c(n,n)
 double precision :: L(n,n), U(n,n), b(n), d(n), x(n)
 double precision :: coeff
 integer :: i, j, k

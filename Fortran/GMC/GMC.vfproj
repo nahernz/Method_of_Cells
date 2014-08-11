@@ -25,7 +25,25 @@
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration></Configurations>
 	<Files>
 		<Filter Name="Header Files" Filter="fi;fd"/>
-		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
+		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+		<Filter Name="DGESV">
+		<File RelativePath="..\DGESV\dgemm.f"/>
+		<File RelativePath="..\DGESV\dger.f"/>
+		<File RelativePath="..\DGESV\dgesv.f"/>
+		<File RelativePath="..\DGESV\dgetf2.f"/>
+		<File RelativePath="..\DGESV\dgetrf.f"/>
+		<File RelativePath="..\DGESV\dgetrs.f"/>
+		<File RelativePath="..\DGESV\dlamch.f"/>
+		<File RelativePath="..\DGESV\dlaswp.f"/>
+		<File RelativePath="..\DGESV\dscal.f"/>
+		<File RelativePath="..\DGESV\dswap.f"/>
+		<File RelativePath="..\DGESV\dtrsm.f"/>
+		<File RelativePath="..\DGESV\idamax.f"/>
+		<File RelativePath="..\DGESV\ieeeck.f"/>
+		<File RelativePath="..\DGESV\ilaenv.f"/>
+		<File RelativePath="..\DGESV\iparmq.f"/>
+		<File RelativePath="..\DGESV\lsame.f"/>
+		<File RelativePath="..\DGESV\xerbla.f"/></Filter></Filter>
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
 		<File RelativePath=".\GMC.f90"/></Filter>
 		<File RelativePath=".\ReadMe.txt"/></Files>
