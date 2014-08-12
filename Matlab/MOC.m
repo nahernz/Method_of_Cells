@@ -1,9 +1,9 @@
 function [C_star,s_avg,e_avg] = MOC(input)
 
 close all
-
+input = 'TEST_0.5_01_AS';
 %input = '2x2_0.5_01_AS';
-input = '7x7_0.5_01_AS';
+%input = '7x7_0.5_01_AS';
 %input = 'Hex_0.5_01_AS';
 %input = 'HexInter_0.5_01_AS';
 %input = 'HexInter_0.5_02_AS';
@@ -60,12 +60,14 @@ end
 % Cell Architecture
 %amod = arch.amod;
    
-    L = arch.l;
-    H = arch.h;
+    %L = arch.l;
+    L = [6e-3, 4e-3];
+    %H = arch.h;
+    H = L;
 
     
-    SM = arch.sm;
-   
+    %SM = arch.sm;
+    SM = [1,2;2,2];
 
 Ng = size(L,2);
 l=zeros(1,Ng);
@@ -331,7 +333,7 @@ for nl = 1:nloads
         end
     end
     
-    r1
+    r1;
     
     i = 1;
     for b=1:Nb
@@ -396,12 +398,12 @@ for nl = 1:nloads
     
     % Values needed to compare to CCM model:
     E11 = C_star(1,1) - 2*C_star(1,2)^2/(C_star(2,2) + C_star(2,3))
-    v12 = C_star(1,2)/(C_star(2,2) + C_star(2,3))
-    G12 = C_star(6,6)
-    K23 = 1/2*(C_star(2,2) + C_star(2,3))
-    G23 = 1/2*(C_star(2,2) - C_star(2,3))
-    E22 = 4*G23*K23/(K23 + (1 + 4*K23*v12^2/E11)*G23)
-    v23 = E22/(2*G23) - 1
+    v12 = C_star(1,2)/(C_star(2,2) + C_star(2,3));
+    G12 = C_star(6,6);
+    K23 = 1/2*(C_star(2,2) + C_star(2,3));
+    G23 = 1/2*(C_star(2,2) - C_star(2,3));
+    E22 = 4*G23*K23/(K23 + (1 + 4*K23*v12^2/E11)*G23);
+    v23 = E22/(2*G23) - 1;
 
    %E112 = s_avg(1)/e_avg(1);
    %E222 = s_avg(2)/e_avg(2)

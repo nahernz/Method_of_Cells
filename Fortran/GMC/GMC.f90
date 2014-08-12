@@ -19,21 +19,21 @@ PROGRAM GMC
 
     ! Variables
     ! Fiber Material Properties
-    DOUBLE PRECISION, PARAMETER :: E11f = 231d9
-    DOUBLE PRECISION, PARAMETER :: E22f = 15d9
-    DOUBLE PRECISION, PARAMETER :: v12f = 0.14d0
-    DOUBLE PRECISION, PARAMETER :: G12f = 24d9
-    DOUBLE PRECISION, PARAMETER :: G23f = 5.01d9
-    DOUBLE PRECISION :: v23f = (E22f/(2*G23f))-1
+    DOUBLE PRECISION, PARAMETER :: E11f = 2.5d5
+    DOUBLE PRECISION, PARAMETER :: E22f = 4d4
+    DOUBLE PRECISION, PARAMETER :: v12f = 0.32d0
+    DOUBLE PRECISION, PARAMETER :: G12f = 3d4
+    DOUBLE PRECISION, PARAMETER :: G23f = 1.6d4
+    DOUBLE PRECISION, PARAMETER :: v23f = 0.25
     ! Matrix Material Properties
-    DOUBLE PRECISION, PARAMETER :: Em = 3d9
-    DOUBLE PRECISION, PARAMETER :: vm = 0.36d0
+    DOUBLE PRECISION, PARAMETER :: Em = 3.25d3
+    DOUBLE PRECISION, PARAMETER :: vm = 0.32d0
     ! Build Material Stiffnesses
     DOUBLE PRECISION                  :: delf
     DOUBLE PRECISION, DIMENSION(6, 6) :: Cf, Cm
     DOUBLE PRECISION                  :: c1, c2
     ! Geometry Data
-    INTEGER, PARAMETER :: nc = 7
+    INTEGER, PARAMETER :: nc = 2
     DOUBLE PRECISION, DIMENSION(nc)   :: H, L, y, x
     DOUBLE PRECISION, DIMENSION(nc,nc) :: SM
     INTEGER              :: Ng, Nb, g, b
@@ -43,7 +43,7 @@ PROGRAM GMC
     INTEGER :: count = 1, i, j, NRHS, LDA, LDB, N, INFO
     ! Output Variables
     DOUBLE PRECISION C(6,6)
-    CHARACTER(11), PARAMETER :: frmt = "(6EN12.2E1)"
+    CHARACTER(11), PARAMETER :: frmt = "(6EN13.2E1)"
     
 !-----------------------------------------------------------------------------
 !                           CODE STARTS
@@ -78,22 +78,22 @@ PROGRAM GMC
     ! Geometry Variables
     ! must change 'nc' to change cell grid size
     ! Four cell
-    !L = (/ 6e-3, 4e-3 /)
-    !H = L
-    !SM(1:2,1) = (/ 1,2 /)
-    !SM(1:2,2) = (/ 2,2 /)
+    L = (/ 6e-3, 4e-3 /)
+    H = L
+    SM(1:2,1) = (/ 1,2 /)
+    SM(1:2,2) = (/ 2,2 /)
     
     ! Square Pack
-    L = (/ 6.75334e-4, 6.14488e-4, 6.14488e-4, 2.45795e-3,&
-           6.14488e-4, 6.14488e-4, 6.75334e-4 /)
-    H = L
-    SM(1:7,1) = (/ 2,2,2,2,2,2,2 /)
-    SM(1:7,2) = (/ 2,2,2,1,2,2,2 /)
-    SM(1:7,3) = (/ 2,2,1,1,1,2,2 /)
-    SM(1:7,4) = (/ 2,1,1,1,1,1,2 /)
-    SM(1:7,5) = (/ 2,2,1,1,1,2,2 /)
-    SM(1:7,6) = (/ 2,2,2,1,2,2,2 /)
-    SM(1:7,7) = (/ 2,2,2,2,2,2,2 /)
+    !L = (/ 6.75334e-4, 6.14488e-4, 6.14488e-4, 2.45795e-3,&
+    !       6.14488e-4, 6.14488e-4, 6.75334e-4 /)
+    !H = L
+    !SM(1:7,1) = (/ 2,2,2,2,2,2,2 /)
+    !SM(1:7,2) = (/ 2,2,2,1,2,2,2 /)
+    !SM(1:7,3) = (/ 2,2,1,1,1,2,2 /)
+    !SM(1:7,4) = (/ 2,1,1,1,1,1,2 /)
+    !SM(1:7,5) = (/ 2,2,1,1,1,2,2 /)
+    !SM(1:7,6) = (/ 2,2,2,1,2,2,2 /)
+    !SM(1:7,7) = (/ 2,2,2,2,2,2,2 /)
 
     Ng = SIZE(L)
     Nb = SIZE(H)
@@ -302,9 +302,11 @@ M = K
 !WRITE (*,*) LDB
 !WRITE (*,*) SIZE(A,1), SIZE(A,2)
 !WRITE (*,*) SIZE(M,1), SIZE(M,2)
+!WRITE (*,frmt) A(1,1:6)
 
 
 call DGESV( N, NRHS, A, LDA, IPIV, M, LDB, INFO )
+
 
 IF (INFO == 0) THEN
     ! solution found
@@ -319,21 +321,22 @@ END IF
 !------------------------------------------------------------------------------
 !                            BUILD STIFFNESS
 !------------------------------------------------------------------------------
-
+!WRITE (*,*) 
 C = 0
 i = 1
     DO b=1,Nb
         DO g=1,Ng
             IF (SM(b,g)==1) THEN
-                C = C + 1/(sum(H)*sum(L))*H(b)*L(g)*Cf*M((i-1)*6+1:(i)*6,1:6)
+                C = C + 1/(sum(H)*sum(L))*H(b)*L(g)*MATMUL(Cf,M((i-1)*6+1:(i)*6,1:6))
             ELSE 
-                C = C + 1/(sum(H)*sum(L))*H(b)*L(g)*Cm*M((i-1)*6+1:(i)*6,1:6)
+                C = C + 1/(sum(H)*sum(L))*H(b)*L(g)*MATMUL(Cm,M((i-1)*6+1:(i)*6,1:6))
             END IF
             i = i + 1
             
         END DO
     END DO
-    !WRITE (*,*) C(1,1) - 2*C(1,2)**2/(C(2,2) + C(2,3))
+    !WRITE (*,*)
+    !WRITE (*,"(EN12.2E1)") C(1,1) - 2*C(1,2)**2/(C(2,2) + C(2,3))
     
 !------------------------------------------------------------------------------
 !                         WRITE STIFFNESS TO STIFFNESS.TXT
@@ -342,6 +345,8 @@ i = 1
     WRITE (*,*)
     
     OPEN (unit = 2, file = "Stiffness.txt")
+    WRITE (2,*) "C ="
+    WRITE (2,*)
     DO i = 1,6
         WRITE (2,frmt) (C(i,j), j = 1,6)
         WRITE (*,frmt) (C(i,j), j = 1,6)
@@ -350,7 +355,7 @@ i = 1
     WRITE (*,*)
     
     CLOSE (2)
-    PAUSE
+!    PAUSE
     END PROGRAM GMC
 
 

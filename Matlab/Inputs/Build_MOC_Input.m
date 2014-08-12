@@ -9,7 +9,7 @@ function Build_MOC_Input
 
 % create the filespace
 
-filename = 'HexInter_0.5_02_AS.moci';
+filename = 'TEST_0.5_01_AS.moci';
 fid = fopen(filename,'w+');
 
 % create the input header
@@ -102,7 +102,7 @@ else
 end
 
     % MATERIAL 3 (interphase)
-if true
+if false
     mat = 3;
     cmod = 2;
     %   1 = general elastic
@@ -147,7 +147,7 @@ end
 
 fprintf(fid,'*CELL\n');
 
-amod = 5;
+amod = 1;
 %   1 = 4 cell square
 %   2 = fiber centered square
 %   3 = hex packed rectangle 
