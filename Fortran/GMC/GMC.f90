@@ -33,9 +33,10 @@ PROGRAM GMC
     DOUBLE PRECISION, DIMENSION(6, 6) :: Cf, Cm
     DOUBLE PRECISION                  :: c1, c2
     ! Geometry Data
-    INTEGER, PARAMETER :: nc = 2
-    DOUBLE PRECISION, DIMENSION(nc)   :: H, L, y, x
-    DOUBLE PRECISION, DIMENSION(nc,nc) :: SM
+    INTEGER, PARAMETER :: ny = 2, nx = 2
+    DOUBLE PRECISION, DIMENSION(nx)   :: L, x
+    DOUBLE PRECISION, DIMENSION(ny)   :: H, y
+    DOUBLE PRECISION, DIMENSION(ny,nx) :: SM
     INTEGER              :: Ng, Nb, g, b
     ! Solving Variables
     DOUBLE PRECISION, DIMENSION(:, :), ALLOCATABLE :: A, K, M
