@@ -50,8 +50,9 @@ PROGRAM GMC
 !-----------------------------------------------------------------------------
 !                           CODE STARTS
 !-----------------------------------------------------------------------------
-    WRITE (*,'(A)') 'Generalized Method of Cells'
-    WRITE (*,'(A)') 'written by Michael Kaplan and Rehan Nawaz'
+    WRITE (*,*) "Generalized Method of Cells"
+    WRITE (*,*) "written by Michael Kaplan and Rehan Nawaz"
+    WRITE (*,*)
     
     Call GetArg(1,input)
     IF (LEN_TRIM(input) == 0) THEN
@@ -77,7 +78,6 @@ PROGRAM GMC
     c1 = Em*vm/((1.0+vm)*(1.0-2.0*vm))
     c2 = Em/(2.0*(1.0+vm))
 
-    WRITE (*,*)
     Cm(1:6,1) = (/ c1+2.0*c2, c1, c1, 0.0d0, 0.0d0, 0.0d0 /)
     Cm(1:6,2) = (/ c1, c1+2.0*c2, c1, 0.0d0, 0.0d0, 0.0d0 /)
     Cm(1:6,3) = (/ c1, c1, c1+2.0*c2, 0.0d0, 0.0d0, 0.0d0 /)
@@ -413,7 +413,8 @@ i = 1
               READ(1,*) SM(1:nx,i)
           END DO
       ELSE
-          WRITE (*,*) "Input file """, input, """ does not exist"
+          WRITE (*,*) "Input file """, input(1:LEN_TRIM(input)), """ does not exist"
+          WRITE (*,*)
           PAUSE
           STOP
       END IF
