@@ -66,13 +66,10 @@ PROGRAM GMC
     CALL GMC_in(input, E11f, E22f, v12f, v23f, G12f, G23f, &
                 Em, vm, nx, ny)
     ALLOCATE(x(nx),y(ny))
-    
-    
-    ! Body of GMC
-    WRITE (*,'(A)') 'Generalized Method of Cells'
-    WRITE (*,'(A)') 'written by Michael Kaplan and Rehan Nawaz'
-    
-    ! Build the stiffness matricees
+
+!-----------------------------------------------------------------------------
+!                        BUILD THE STIFFNESS MATRICEES
+!-----------------------------------------------------------------------------
     
     delf = E22f*v12f**2+E11f*(v23f-1.0)
     c1 = Em*vm/((1.0+vm)*(1.0-2.0*vm))
