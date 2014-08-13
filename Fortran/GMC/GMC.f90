@@ -11,32 +11,32 @@
 !  PURPOSE:  Entry point for the console application.
 !
 !****************************************************************************   
-PROGRAM GMC
+MODULE Cell
+    DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: L, H
+    DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: SM
+END MODULE Cell
     
+    
+PROGRAM GMC
+    USE Cell
     IMPLICIT NONE
     
     EXTERNAL DGESV
 
     ! Variables
+    CHARACTER(32) :: input
+    CHARACTER(LEN=9) :: dummy = "input.txt"
     ! Fiber Material Properties
-    DOUBLE PRECISION, PARAMETER :: E11f = 2.5d5
-    DOUBLE PRECISION, PARAMETER :: E22f = 4d4
-    DOUBLE PRECISION, PARAMETER :: v12f = 0.32d0
-    DOUBLE PRECISION, PARAMETER :: G12f = 3d4
-    DOUBLE PRECISION, PARAMETER :: G23f = 1.6d4
-    DOUBLE PRECISION, PARAMETER :: v23f = 0.25
+    DOUBLE PRECISION :: E11f, E22f, v12f, v23f, G12f, G23f
     ! Matrix Material Properties
-    DOUBLE PRECISION, PARAMETER :: Em = 3.25d3
-    DOUBLE PRECISION, PARAMETER :: vm = 0.32d0
+    DOUBLE PRECISION :: Em, vm
     ! Build Material Stiffnesses
     DOUBLE PRECISION                  :: delf
     DOUBLE PRECISION, DIMENSION(6, 6) :: Cf, Cm
     DOUBLE PRECISION                  :: c1, c2
     ! Geometry Data
-    INTEGER, PARAMETER :: ny = 2, nx = 2
-    DOUBLE PRECISION, DIMENSION(nx)   :: L, x
-    DOUBLE PRECISION, DIMENSION(ny)   :: H, y
-    DOUBLE PRECISION, DIMENSION(ny,nx) :: SM
+    INTEGER :: ny, nx
+    DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: x, y
     INTEGER              :: Ng, Nb, g, b
     ! Solving Variables
     DOUBLE PRECISION, DIMENSION(:, :), ALLOCATABLE :: A, K, M
@@ -46,9 +46,26 @@ PROGRAM GMC
     DOUBLE PRECISION C(6,6)
     CHARACTER(11), PARAMETER :: frmt = "(6EN13.2E1)"
     
+    
 !-----------------------------------------------------------------------------
 !                           CODE STARTS
 !-----------------------------------------------------------------------------
+    WRITE (*,'(A)') 'Generalized Method of Cells'
+    WRITE (*,'(A)') 'written by Michael Kaplan and Rehan Nawaz'
+    
+    Call GetArg(1,input)
+    IF (LEN_TRIM(input) == 0) THEN
+        input = dummy
+    END IF
+    
+!-----------------------------------------------------------------------------
+!                            READ INPUT FILE
+!-----------------------------------------------------------------------------
+    
+    CALL GMC_in(input, E11f, E22f, v12f, v23f, G12f, G23f, &
+                Em, vm, nx, ny)
+    ALLOCATE(x(nx),y(ny))
+    
     
     ! Body of GMC
     WRITE (*,'(A)') 'Generalized Method of Cells'
@@ -79,10 +96,10 @@ PROGRAM GMC
     ! Geometry Variables
     ! must change 'nc' to change cell grid size
     ! Four cell
-    L = (/ 6e-3, 4e-3 /)
-    H = L
-    SM(1:2,1) = (/ 1,2 /)
-    SM(1:2,2) = (/ 2,2 /)
+    !L = (/ 6e-3, 4e-3 /)
+    !H = L
+    !SM(1:2,1) = (/ 1,2 /)
+    !SM(1:2,2) = (/ 2,2 /)
     
     ! Square Pack
     !L = (/ 6.75334e-4, 6.14488e-4, 6.14488e-4, 2.45795e-3,&
@@ -356,7 +373,49 @@ i = 1
     WRITE (*,*)
     
     CLOSE (2)
-!    PAUSE
+    PAUSE
     END PROGRAM GMC
 
-
+! -----------------------------------------------------------------------
+!               Generalized Method of Cells Input Reader
+! -----------------------------------------------------------------------
+!
+!     Read the input file specified and return the material properties   
+!     and cell architecture to the GMC code. The code is currently only  
+!     capable of specifying a transversely isotropic fiber and isotropic
+!     matrix. Materials are linear elastic and do not damage. 
+      
+      SUBROUTINE GMC_in(input, E11f, E22f, v12f, v23f, G12f, G23f, &
+                        Em, vm, nx, ny)
+      USE Cell
+      IMPLICIT NONE
+      
+      CHARACTER(LEN=*) :: input
+      DOUBLE PRECISION :: E11f, E22f, v12f, v23f, G12f, G23f, Em, vm
+      INTEGER :: nx, ny, i
+      LOGICAL :: there
+      
+      INQUIRE(file = input, EXIST = there)
+      if (there) THEN      
+          OPEN(unit = 1, file = input)
+          READ(1,*) E11f, E22f, v12f, v23f, G12f, G23f
+          READ(1,*) Em, vm
+          READ(1,*) nx, ny
+      
+          ALLOCATE(L(nx)) 
+          ALLOCATE(H(ny))
+          ALLOCATE(SM(ny,nx))
+      
+          READ(1,*) L
+          READ(1,*) H
+      
+          DO i = 1,ny
+              READ(1,*) SM(1:nx,i)
+          END DO
+      ELSE
+          WRITE (*,*) "Input file """, input, """ does not exist"
+          PAUSE
+          STOP
+      END IF
+      
+      END SUBROUTINE GMC_in
